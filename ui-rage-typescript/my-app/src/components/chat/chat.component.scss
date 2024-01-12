@@ -1,0 +1,42 @@
+/* You can likely remove this entire block if you are handling the styles with Chakra UI props */
+.chat-message {
+}
+
+/* These can also be removed if you use Chakra UI's Text component with color props */
+.chat-time {
+}
+
+.chat-username {
+}
+
+.chat-text {
+}
+
+/* The chat-window might still be necessary for positioning and size */
+.chat-window {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 50vw;
+  max-width: 600px;
+  height: 400px;
+  overflow: hidden;
+}
+
+/* The chat-messages container's flex and overflow handling can be managed by Chakra UI props */
+.chat-messages {
+}
+
+/* The chat-input-container flex display and padding can be set with Chakra UI props */
+.chat-input-container {
+}
+
+/* The chat-input flex-grow can be managed with Chakra UI props */
+.chat-input {
+}
+
+/* The send-button flex property can be managed with Chakra UI props */
+.send-button {
+}
+
+/* If you are using additional custom styles that are not covered by Chakra UI, you would keep them */

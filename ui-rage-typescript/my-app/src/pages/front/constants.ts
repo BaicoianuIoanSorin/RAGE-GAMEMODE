@@ -5,5 +5,5 @@ export interface WindowsOpened {
 
 export const defaultWindowsOpened: WindowsOpened = {
   registerWindow: false,
-  loginWindow: true,
+  loginWindow: false,
 };

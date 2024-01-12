@@ -9,6 +9,7 @@ import { useState } from "react";
 import Login from "../../components/authentication/login/login.component";
 import { makeToast } from "../../utils/components-used/toast";
 import Register from "../../components/authentication/register/register.component";
+import { ChatWindow } from "../../components/chat/chat.component";
 
 const Front = () => {
   const [windowsOpened, setWindowsOpened] = useState(defaultWindowsOpened);
@@ -56,6 +57,7 @@ const Front = () => {
   }
   return (
     <div className="front-container">
+      <ChatWindow/>
       {windowsOpened.loginWindow && (
         <Login
           handleRegisterClick={() =>

@@ -4,6 +4,7 @@ import './position-savings';
 import './auth';
 import './sound';
 import './player';
+import './commands/utils';
 import * as rpc from 'rage-rpc';
 import { WINDOW_EVENTS, WINDOW_OPENED } from '@shared/window/windows.constants';
 
@@ -17,6 +18,7 @@ mp.events.add(PLAYER_CONSTANTS.PLAYERS_READY, () => {
 	mp.players.local.freezePosition(true);
     mp.game.ui.setMinimapVisible(false);
     mp.gui.chat.activate(false);
+	// TODO later it will be enabled browser.markAsChat();
     mp.gui.cursor.show(true, true);
 	setTimeout(async () => {
 		mp.gui.cursor.visible = true;
@@ -29,7 +31,6 @@ mp.events.add(PLAYER_CONSTANTS.PLAYERS_READY, () => {
 rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
 	mp.players.local.freezePosition(false);
 	mp.game.ui.setMinimapVisible(true);
-	mp.gui.chat.activate(true);
 	mp.gui.cursor.show(false, false);
 	setTimeout(() => {
 		mp.events.callRemote(AUTH.SERVER_LOGIN_SUCCES);
