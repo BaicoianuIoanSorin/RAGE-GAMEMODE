@@ -54,14 +54,7 @@ export const ChatWindow = () => {
   
   const handleSend = () => {
     if (input.trim() === "") return;
-
-    if (input.startsWith("/")) {
-      if ("rpc" in window && "callClient" in window.rpc) {
-        // window.rpc.callClient("chatCommand", input);
-        makeToast(window.rpc, toast, "Chat", "Here should be a message", "error");
-        window.rpc.triggerClient(ChatEvents.CHAT_COMMAND, input);
-      }
-    }
+    
     // Check if the message exceeds 250 characters
     if (input.length > 250) {
       console.log("Message cannot exceed 250 characters.");
@@ -80,18 +73,28 @@ export const ChatWindow = () => {
       return;
     }
 
-    const newMessage: Message = {
-      time: new Date().toLocaleTimeString().slice(0, -3),
-      username: "YourUsername",
-      message: input,
-    };
-    setMessages((prevMessages) => [newMessage, ...prevMessages]);
-    setInput("");
-    if (isOpen) {
-      onToggle();
+    if (input.startsWith("/")) {
+      if ("rpc" in window && "callClient" in window.rpc) {
+        // window.rpc.callClient("chatCommand", input);
+        makeToast(window.rpc, toast, "Chat", "Here should be a message", "error");
+        window.rpc.triggerClient(ChatEvents.CHAT_COMMAND, input);
+        
+      }
     }
-    setLastMessageTime(new Date());
-    setWindowOpacity(1); // Reset opacity when a new message is sent
+    else {
+      const newMessage: Message = {
+        time: new Date().toLocaleTimeString().slice(0, -3),
+        username: "YourUsername",
+        message: input,
+      };
+      setMessages((prevMessages) => [newMessage, ...prevMessages]);
+    }
+    setInput("");
+      if (isOpen) {
+        onToggle();
+      }
+      setLastMessageTime(new Date());
+      setWindowOpacity(1); // Reset opacity when a new message is sent
   };
 
   useEffect(() => {
