@@ -146,7 +146,7 @@ const Login = () => {
             <Input
               id="password"
               value={password}
-              pr="4.5rem"
+              pr="4.5rem" 
               type={show ? "text" : "password"}
               required
               placeholder="Enter password"
