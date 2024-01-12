@@ -1,0 +1,35 @@
+.box-container {
+  margin: 0;
+  padding: 0;
+  .background-image {
+    background-image: url("../../assets/wallpaperflare.com_wallpaper.jpg");
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100vw;
+    height: 100vh;
+    // background: hsl(72, 77%, 73%, 0.3);
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(237, 247, 95, 0.2); /* Black color with 20% opacity */
+      }
+  }
+
+  .authentication-container {
+    display: table;
+    z-index: 1;
+    position: absolute; /* Positioned absolutely */
+    top: 50%; /* Adjust this value as needed */
+    left: 50%; /* Adjust this value as needed */
+    transform: translate(-50%, -50%); 
+
+    .form-item {
+        padding: 7px 0px;
+    }
+  }
+}
