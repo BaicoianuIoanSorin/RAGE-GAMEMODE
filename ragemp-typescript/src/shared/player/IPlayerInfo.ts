@@ -3,4 +3,6 @@ export interface IPlayerInfo {
     currentId: number;
     username: string;
     email?: string;
+    admin?: number;
+    helper?: number;
 }

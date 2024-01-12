@@ -29,7 +29,7 @@ const Front = () => {
     window.rpc.on(WINDOW_EVENTS.OPEN_WINDOW, (windowOpened) => {
       switch (windowOpened) {
         case WINDOW_OPENED.LOGIN: {
-          setWindowsOpened({ ...windowsOpened, loginWindow: true });
+          handleWindowChange([WINDOW_OPENED.LOGIN]);
           break;
         }
       }
@@ -38,11 +38,11 @@ const Front = () => {
     window.rpc.on(WINDOW_EVENTS.CLOSE_WINDOW, (windowClosed) => {
       switch (windowClosed) {
         case WINDOW_OPENED.LOGIN: {
-          setWindowsOpened({ ...windowsOpened, loginWindow: false });
+          handleWindowChange([WINDOW_OPENED.LOGIN, WINDOW_OPENED.CHAT]);
           break;
         }
         case WINDOW_OPENED.REGISTER: {
-          setWindowsOpened({ ...windowsOpened, registerWindow: false });
+          handleWindowChange([WINDOW_OPENED.REGISTER]);
           makeToast(
             window.rpc,
             toast,
@@ -57,7 +57,7 @@ const Front = () => {
   }
   return (
     <div className="front-container">
-      <ChatWindow/>
+      {windowsOpened.chatWindow && (<ChatWindow/>)}
       {windowsOpened.loginWindow && (
         <Login
           handleRegisterClick={() =>

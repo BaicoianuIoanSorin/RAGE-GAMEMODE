@@ -14,9 +14,17 @@ export class User {
 	@Column()
 	email: string;
 
-	constructor(username: string, password: string, email: string) {
+	@Column()
+	admin: number;
+
+	@Column()
+	helper: number;
+
+	constructor(username: string, password: string, email: string, admin: number, helper: number) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
+		this.admin = admin;
+		this.helper = helper;
 	}
 }

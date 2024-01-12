@@ -5,6 +5,7 @@ import './auth';
 import './sound';
 import './player';
 import './commands/utils';
+import './chat';
 import * as rpc from 'rage-rpc';
 import { WINDOW_EVENTS, WINDOW_OPENED } from '@shared/window/windows.constants';
 
