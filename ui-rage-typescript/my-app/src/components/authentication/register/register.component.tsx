@@ -11,19 +11,25 @@ import { EmailIcon, LockIcon } from "@chakra-ui/icons";
 import {
   GENERAL_STATUS_CODES,
   LOGIN_STATUS_CODES,
-} from "../../utils/status-codes/status-codes.constants";
-import { AUTH } from "../../utils/authentication/events.constants";
+} from "../../../utils/status-codes/status-codes.constants";
+import { AUTH } from "../../../utils/authentication/events.constants";
 
-import "./login.component.scss";
-import { makeToast } from "../../utils/components-used/toast";
+import { makeToast } from "../../../utils/components-used/toast";
 import { useToast } from "@chakra-ui/react";
 
+import "./register.component.scss";
+import { CLIENT_PLAYER_EVENTS } from "../../../utils/player/events.constants";
+import { IPlayerInfo } from "../../../utils/player/IPlayerInfo";
 const defaultFormFields = {
   email: "",
   password: "",
 };
 
-const Login = () => {
+interface RegisterProps {
+  handleLoginClick: () => void,
+};
+
+const Register = (props: RegisterProps) => {
   const toast = useToast();
 
   const [isVisible, setIsVisible] = useState(true);
@@ -31,10 +37,25 @@ const Login = () => {
   const { email, password } = formFields;
   const [isSubmittingDisabled, setIsSubmittingDisabled] = useState(true);
   const [show, setShow] = useState(false);
+  const [currentPlayer, setCurrentPlayer] = useState({
+    username: '',
+    currentId: -1,
+  });
 
   const resetFormFields = () => {
     setFormFields(defaultFormFields);
   };
+
+  useEffect(() => {
+    if ("rpc" in window && "callClient" in window.rpc) {
+      window.rpc
+        .callClient(CLIENT_PLAYER_EVENTS.GET_PLAYER_INFO)
+        .then((response) => {
+          const playerResponse: IPlayerInfo = JSON.parse(response);
+          setCurrentPlayer({...playerResponse});
+        });
+    }
+  }, []);
 
   useEffect(() => {
     if (email && password) {
@@ -64,16 +85,16 @@ const Login = () => {
     if ("rpc" in window && "callClient" in window.rpc) {
       const formFieldsJSON = JSON.stringify(formFields);
       let response = await window.rpc.callClient(
-        AUTH.CLIENT_LOGIN,
+        AUTH.CLIENT_REGISTER,
         formFieldsJSON
       );
       if (response === GENERAL_STATUS_CODES.OK) {
-        window.rpc.triggerClient(AUTH.CLIENT_LOGIN_SUCCES);
+        window.rpc.triggerClient(AUTH.CLIENT_REGISTER_SUCCES);
         makeToast(
           window.rpc,
           toast,
           "Account info",
-          "You've successfully logged in.",
+          "You've registered successfully.",
           "success"
         );
         setIsVisible(false);
@@ -87,7 +108,7 @@ const Login = () => {
         window.rpc,
         toast,
         "Account info",
-        "You've successfully logged in.",
+        "You've registered successfully.",
         "success"
       );
     }
@@ -123,6 +144,18 @@ const Login = () => {
         p={4}
         color="black"
       >
+        <h2>Register</h2>
+        {currentPlayer.currentId !== -1 && (
+          <p>
+          Your name: <span
+            style={{
+              fontWeight: "bold",
+            }}
+          >
+            {currentPlayer.username}
+          </span>
+        </p>
+        )}
         <div className="form-item">
           <InputGroup>
             <InputLeftElement pointerEvents="none">
@@ -160,10 +193,11 @@ const Login = () => {
             </InputRightElement>
           </InputGroup>
         </div>
+        <p> Already have an account? <span onClick={props.handleLoginClick}>Login</span></p>
         <Button onClick={onSubmit} isDisabled={isSubmittingDisabled}>Submit</Button>
       </Stack>
     </Box>
   );
 };
 
-export default Login;
+export default Register;

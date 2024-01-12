@@ -91,22 +91,26 @@ rpc.register(AUTH.SERVER_LOGIN, (formFieldsJSON) => {
 	// 	);
 });
 
-// TODO this one needs to be transformed in an event
-mp.events.addCommand(AUTH.CMD_REGISTER, async (player: PlayerMp, password: string) => {
-	if (!isElegible(player, password)) return;
-
-	let username = player.name;
+rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
+	console.log(AUTH.SERVER_REGISTER);
+	let formFields = JSON.parse(formFieldsJSON);
+	console.log(formFields);
+	console.log(AUTH.SERVER_REGISTER);
+	let player: PlayerMp = mp.players.at(formFields.playerId);
+	if (!isElegible(player, formFields.password)) return;
 
 	const userRepository = AppDataSource.getRepository(User);
 
-	const playerDatabase = await userRepository.findOneBy({ username: username });
+	const playerDatabase = await userRepository.findOneBy({ username: player.name });
 
 	if (playerDatabase) {
 		player.outputChatBox('Username already exists.');
-		return;
+		return LOGIN_STATUS_CODES.USERNAME_IS_NOT_VALID;
 	}
 
-	const newUser = new User(player.name, password);
+	// TODO hash this password
+	const newUser = new User(player.name, formFields.password, formFields.email);
 	await userRepository.save(newUser);
 	player.outputChatBox('You are registered.');
+	return GENERAL_STATUS_CODES.OK;
 });

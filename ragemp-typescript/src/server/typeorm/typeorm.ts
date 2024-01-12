@@ -8,7 +8,7 @@ export const AppDataSource = new DataSource({
     port: 3306, // or your database port
     username: "admin",
     password: "adminparola",
-    database: "ragemp_server_2025",
+    database: "ragemp_server_2025_v2",
     entities: [User], // Include your entity models here
     synchronize: true, // Note: Only use in development environment!
 	driver: require('mysql2'),

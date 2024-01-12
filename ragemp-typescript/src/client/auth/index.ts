@@ -13,3 +13,16 @@ rpc.register(AUTH.CLIENT_LOGIN, async (formFieldsJSON) => {
 	mp.console.logInfo(response);
 	return response;
 });
+
+rpc.register(AUTH.CLIENT_REGISTER, async (formFieldsJSON) => {
+	let playerId = mp.players.local.id;
+	let formFields = JSON.parse(formFieldsJSON);
+	let formFieldsToServer = {
+		playerId: playerId,
+		email: formFields.email,
+		password: formFields.password
+	};
+	let response = await rpc.callServer(AUTH.SERVER_REGISTER, JSON.stringify(formFieldsToServer));
+	mp.console.logInfo(response);
+	return response;
+});

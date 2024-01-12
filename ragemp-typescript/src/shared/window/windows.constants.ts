@@ -1,6 +1,6 @@
-export const WINDOW_OPENED = {
-    REGISTER: 'register',
-    LOGIN: 'login',
+export enum WINDOW_OPENED {
+    REGISTER = 'registerWindow',
+    LOGIN = 'loginWindow',
 }
 
 export const WINDOW_EVENTS = {

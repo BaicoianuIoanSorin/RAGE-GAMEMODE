@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   .background-image {
-    background-image: url("../../assets/wallpaperflare.com_wallpaper.jpg");
+    background-image: url("../../../assets/wallpaperflare.com_wallpaper.jpg");
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -20,6 +20,8 @@
       }
   }
 
+  text-align: -webkit-center;
+
   .authentication-container {
     display: table;
     z-index: 1;
@@ -30,6 +32,12 @@
 
     .form-item {
         padding: 7px 0px;
+    }
+  }
+  p {
+    span {
+        color: rgb(44, 176, 220);
+        cursor: pointer;
     }
   }
 }

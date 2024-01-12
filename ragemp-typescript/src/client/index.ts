@@ -3,6 +3,7 @@ import { AUTH } from '@shared/authentication/events.constants';
 import './position-savings';
 import './auth';
 import './sound';
+import './player';
 import * as rpc from 'rage-rpc';
 import { WINDOW_EVENTS, WINDOW_OPENED } from '@shared/window/windows.constants';
 
