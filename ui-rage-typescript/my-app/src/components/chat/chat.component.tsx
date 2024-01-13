@@ -87,7 +87,12 @@ export const ChatWindow = () => {
         username: "YourUsername",
         message: input,
       };
-      setMessages((prevMessages) => [newMessage, ...prevMessages]);
+    
+      setMessages((prevMessages) => {
+        const updatedMessages = [newMessage, ...prevMessages];
+        // Keep only the latest 20 messages
+        return updatedMessages.slice(0, 20);
+      });
     }
     setInput("");
       if (isOpen) {
@@ -178,27 +183,7 @@ export const ChatWindow = () => {
             maxLength={250} // Set the max length to 250 characters
             mr="3"
           />
-
-          <IconButton
-            icon={<FaPaperPlane />}
-            colorScheme="blue"
-            onClick={handleSend}
-            aria-label="Send message"
-            size="md"
-            isRound
-          />
         </Box>
-      )}
-      {!isOpen && (
-        <IconButton
-          icon={<FaTimes />}
-          colorScheme="red"
-          variant="ghost"
-          onClick={onToggle}
-          aria-label="Close chat"
-          alignSelf="flex-end"
-          m="2"
-        />
       )}
     </Box>
   );
