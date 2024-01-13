@@ -14,6 +14,7 @@ import { FaPaperPlane, FaTimes } from "react-icons/fa";
 import { Textarea } from "@chakra-ui/react";
 import { makeToast } from "../../utils/components-used/toast";
 import { ChatEvents } from "../../utils/chat/events.constants";
+import { ChatEventInfo } from "../../utils/chat/model";
 
 export const ChatWindow = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -52,7 +53,7 @@ export const ChatWindow = () => {
     };
   }, [input, lastMessageTime]);
   
-  const handleSend = () => {
+  const handleSend = async () => {
     if (input.trim() === "") return;
     
     // Check if the message exceeds 250 characters
@@ -76,8 +77,9 @@ export const ChatWindow = () => {
     if (input.startsWith("/")) {
       if ("rpc" in window && "callClient" in window.rpc) {
         // window.rpc.callClient("chatCommand", input);
-        makeToast(window.rpc, toast, "Chat", "Here should be a message", "error");
-        window.rpc.triggerClient(ChatEvents.CHAT_COMMAND, input);
+        let chatEventInfo: ChatEventInfo = await window.rpc.callClient(ChatEvents.CHAT_COMMAND, input);
+        makeToast(window.rpc, toast, chatEventInfo.title, chatEventInfo.description, chatEventInfo.status);
+        
         
       }
     }

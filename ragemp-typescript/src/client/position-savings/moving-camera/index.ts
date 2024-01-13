@@ -141,7 +141,7 @@ mp.events.add('render', () => {
 	}
 });
 
-rpc.register(CAMERA_EVENTS.GET_CAM_COORDS, (name) => {
+rpc.register(CAMERA_EVENTS.GET_CAM_COORDS, async (name) => {
     mp.console.logInfo(`${CAMERA_EVENTS.GET_CAM_COORDS} -> ${name}`);
     
 	let cameraInformation: CameraInformation = {
@@ -149,5 +149,5 @@ rpc.register(CAMERA_EVENTS.GET_CAM_COORDS, (name) => {
 		pointAtCoord: JSON.stringify(pointingAt(fly.point_distance)),
 		name: name
 	};
-	rpc.callServer(CAMERA_EVENTS.SAVE_CAM_COORDS, JSON.stringify(cameraInformation));
+	return await rpc.callServer(CAMERA_EVENTS.SAVE_CAM_COORDS, JSON.stringify(cameraInformation));
 });
