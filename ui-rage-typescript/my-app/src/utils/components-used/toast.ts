@@ -1,5 +1,6 @@
 import { AUDIO_EVENTS, SoundsEnum, SoundsMap } from "../audio/audio";
 
+// TODO this method should be generic -> the sound should be passed as a parameter as well
 export function makeToast(
   rpc: any | undefined,
   toast: any,
