@@ -35,8 +35,10 @@ rpc.register(CAMERA_EVENTS.SAVE_CAM_COORDS, (cameraInformationJSON: string, info
 
     fs.appendFile(fileSavedPosCam, `Position: ${pos.x}, ${pos.y}, ${pos.z} | pointAtCoord: ${point.position.x}, ${point.position.y}, ${point.position.z} | entity: ${point.entity} - ${cameraInformation.name}\r\n`, (err) => {
         if (err) {
+            // TODO change this from notify to return inside the ui
             player.notify(`~r~SaveCamPos Error: ~w~${err.message}`);
         } else {
+            // TODO change this from notify to return inside the ui
             player.notify(`~g~PositionCam saved. ~w~(${cameraInformation.name})`);
         }
     });

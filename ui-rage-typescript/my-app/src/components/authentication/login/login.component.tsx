@@ -87,6 +87,7 @@ const Login = (props: LoginProps) => {
         formFieldsJSON
       );
       if (response === GENERAL_STATUS_CODES.OK) {
+        // TODO would be nice to have a token here for staying logged in
         window.rpc.triggerClient(AUTH.CLIENT_LOGIN_SUCCES);
         makeToast(
           window.rpc,
