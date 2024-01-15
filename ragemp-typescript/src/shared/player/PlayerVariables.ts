@@ -1,10 +1,6 @@
 export const PlayersVariables = {
-    // email will be deleted
+    isLoggedIn: 'isLoggedIn',
     serverId: 'serverId',
-    Email: 'email',
     Admin: 'admin',
     Helper: 'helper',
-    // these will be deleted
-    ThirstyLevel: 'thirstyLevel',
-    HungryLevel: 'hungryLevel',
 };

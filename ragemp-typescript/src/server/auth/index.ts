@@ -6,7 +6,6 @@ import { AppDataSource } from '@/typeorm/typeorm';
 import { User } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
-import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';
 
 const userRepository = AppDataSource.getRepository(User);
 const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHunger);
@@ -16,18 +15,6 @@ function isElegible(player: PlayerMp, password: string) {
 		player.outputChatBox('Usage: /login [password]');
 		return false;
 	}
-
-	//disabled as it's not possible to do something like this probably
-	// let playerPosition = player.position;
-	// if (
-	// 	playerPosition &&
-	// 	playerPosition.x != LOGIN_LABEL_VECTOR.x &&
-	// 	playerPosition.y != LOGIN_LABEL_VECTOR.y &&
-	// 	playerPosition.z != LOGIN_LABEL_VECTOR.z
-	// ) {
-	// 	player.outputChatBox('You are not in the login position.');
-	// 	return false;
-	// }
 
 	return true;
 }
@@ -61,7 +48,6 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 			return LOGIN_STATUS_CODES.PASSWORD_IS_NOT_VALID;
 		}
 
-		player.outputChatBox('You are logged in.');
 		// TODO maybe add an util class for player commands inside player shared folder
 		player.setVariables({
 			[PlayersVariables.serverId]: user.id,
@@ -70,28 +56,20 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		});
 
 		player.health = 100;
-		rpc.triggerBrowsers(ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL, 'some message, idk i am sending this');
-		rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN);
-		
+		await rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN, player.id);
+		await rpc.call(
+			AUTH.SERVER_UPDATE_IS_LOGGED_IN,
+			JSON.stringify({
+				playerId: player.id,
+				state: true
+			})
+		);
+
 		return GENERAL_STATUS_CODES.OK;
 	} catch (error: any) {
 		console.log(error);
 		return GENERAL_STATUS_CODES.SERVER_ERROR;
 	}
-
-	// TODO ADD DATE FOR LAST LOGIN
-	// databaseConfig
-	// 	.getHandler()
-	// 	.query(
-	// 		`UPDATE player SET last_login = '${mySQLDate}', is_logged_in = 1 WHERE username = '${player.name}'`,
-	// 		(error: any, results: any, fields: any) => {
-	// 			if (error) {
-	// 				console.log(error);
-	// 				//TODO NEEDS to be changed to STATUS_CODES.SERVER_ERROR
-	// 				return;
-	// 			}
-	// 		}
-	// 	);
 });
 
 rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
@@ -122,20 +100,38 @@ rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
 	}
 });
 
-rpc.register(AUTH.SERVER_UPDATE_LAST_LOGIN, async (message, info) => {
-	// not yet playerInfoJSON used
-
-	const player: PlayerMp = mp.players.at(info.player.id);
+rpc.register(AUTH.SERVER_UPDATE_LAST_LOGIN, async (id) => {
+	console.log(`${AUTH.SERVER_UPDATE_LAST_LOGIN} -> ID: ${id}`);
+	const player: PlayerMp | undefined = mp.players.at(id);
 
 	if (!player) {
 		console.log(`Player not found at ${AUTH.SERVER_UPDATE_LAST_LOGIN}`);
 	}
 
 	try {
-		const userId = player.getVariable(PlayersVariables.serverId);
+		const userId = player?.getVariable(PlayersVariables.serverId);
 		await userRepository.update({ id: userId }, { lastLoggedIn: new Date() });
 		console.log(`Updated last login for user ${userId}`);
 	} catch (error: any) {
 		console.error(`Error at ${AUTH.SERVER_UPDATE_LAST_LOGIN} -> ${error}`);
+	}
+});
+
+rpc.register(AUTH.SERVER_UPDATE_IS_LOGGED_IN, async (jsonInformation) => {
+	console.log(`${AUTH.SERVER_UPDATE_IS_LOGGED_IN} -> jsonInformation: ${jsonInformation}`);
+	const information = JSON.parse(jsonInformation);
+	const player: PlayerMp | undefined = mp.players.at(information.playerId);
+
+	if (!player) {
+		console.log(`Player not found at ${AUTH.SERVER_UPDATE_IS_LOGGED_IN}`);
+	}
+
+	try {
+		const userId = player?.getVariable(PlayersVariables.serverId);
+		await userRepository.update({ id: userId }, { isLoggedIn: information.state });
+		player?.setVariable(PlayersVariables.isLoggedIn, information.state);
+		console.log(`Updated isLoggedIn for user ${userId}`);
+	} catch (error: any) {
+		console.error(`Error at ${AUTH.SERVER_UPDATE_IS_LOGGED_IN} -> ${error}`);
 	}
 });

@@ -10,37 +10,29 @@ import { ThirstyHungerEvents } from "../../../../utils/thursty-hunger/events.con
 export const PlayerStatusComponent: React.FC = () => {
   const [thirstyAndHungryLevel, setThirstyAndHungryLevel] =
     useState<ThirstyHungerLevelModel>({ thirstyLevel: 0, hungryLevel: 0 });
-  const [justInitialized, setJustInitialized] = useState<boolean>(true);
-
-  const runTimer: number = 3 * 60 * 1000; // 3 minutes
 
   let rpc: any = null;
   if ("rpc" in window && "callClient" in window.rpc) {
     rpc = window.rpc;
   }
 
-  // this one updates the thirsty and hungry levels every 5 minutes
-  useEffect(() => {
-    if (justInitialized) {
-      rpc
-        .callServer(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL)
-        .then((thirstHungerLevel: ThirstyHungerLevelModel) => {
-          setThirstyAndHungryLevel(thirstHungerLevel);
-        });
-      setJustInitialized(false);
-      return;
-    } else {
-      let timerForGettingThirstyHungryLevel = setTimeout(async () => {
-        const thirstHungerLevel: ThirstyHungerLevelModel = await rpc.callServer(
-          ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL
-        );
-        setThirstyAndHungryLevel(thirstHungerLevel);
-      }, runTimer);
-      return () => {
-        clearTimeout(timerForGettingThirstyHungryLevel);
-      };
+  rpc.register(
+    ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL,
+    (thirstyHungryLevelJSON: string) => {
+      const thirstyHungryLevel: ThirstyHungerLevelModel =
+        JSON.parse(thirstyHungryLevelJSON);
+      setThirstyAndHungryLevel(thirstyHungryLevel);
     }
-  }, [thirstyAndHungryLevel]);
+  );
+
+  useEffect(() => {
+    // when initializing
+    rpc
+      .callServer(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL)
+      .then((thirstHungerLevel: ThirstyHungerLevelModel) => {
+        setThirstyAndHungryLevel(thirstHungerLevel);
+      });
+  }, []);
 
   return (
     <div className="player-status">

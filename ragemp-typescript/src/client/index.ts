@@ -9,6 +9,8 @@ import './chat';
 import './thirsty-hunger';
 import * as rpc from 'rage-rpc';
 import { WINDOW_EVENTS, WINDOW_OPENED } from '@shared/window/windows.constants';
+import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';
+import { PlayersVariables } from '@shared/player/PlayerVariables';
 
 let browser: BrowserMp;
 
@@ -40,3 +42,19 @@ rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
 	}, 3000);
 	mp.console.logInfo(AUTH.CLIENT_LOGIN_SUCCES);
 });
+
+let isIntervalSet = false;
+
+mp.events.add('render', async () => {
+    if (mp.players.local.getVariable(PlayersVariables.isLoggedIn) && !isIntervalSet) {
+		
+		// updating and retrieving information about hungry and thirsty level
+		const runTimerForGettinAndUpdatingHungryThirsty = 1 * 60 * 1000; // 3 minutes
+		isIntervalSet = true;
+        setInterval(async () => {
+            const newThirstyHungryLevel = await rpc.callServer(ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL, mp.players.local.id);
+            await rpc.callBrowsers(ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL, JSON.stringify(newThirstyHungryLevel));
+        }, runTimerForGettinAndUpdatingHungryThirsty);
+    }
+});
+
