@@ -1,6 +1,5 @@
 import { findPlayerByName } from "@/utils/players";
 import { CameraInformation } from "@shared/camera/model";
-import { ChatEventInfo } from "@shared/chat/model";
 import { Commands } from "@shared/player/commands";
 import { CAMERA_EVENTS } from "@shared/position-savings/events.constants";
 const fs = require('fs').promises;

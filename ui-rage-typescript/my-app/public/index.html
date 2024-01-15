@@ -36,10 +36,26 @@
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <script type="text/javascript" src="./rage-rpc.umd.js">
       window.rpc = rpc;
+      window.chatAPI = {
+        show: (toggle) => this.show(toggle),
+        activate: (toggle) => this.activate(toggle),
+        push: (content) => this.push(content),
+        clear: () => this.clear(),
+      }
+
+      const events = {
+        'chat:push': window.chatAPI.push,
+        'chat:clear': window.chatAPI.clear,
+        'chat:show': window.chatAPI.show,
+        'chat:activate': window.chatAPI.activate,
+      };
+
+      mp.events.add(event, events[event]);
+
     </script>
     <div id="root"></div>
     <!--
-      This HTML file is a template.
+      This.RTCDTMFSender
       If you open it directly in the browser, you will see an empty page.
 
       You can add webfonts, meta tags, or analytics to this file.
