@@ -1,7 +1,7 @@
 export enum WINDOW_OPENED {
     REGISTER = 'registerWindow',
     LOGIN = 'loginWindow',
-    CHAT = 'chatWindow',
+    HUD = 'hudWindow',
 }
 
 export const WINDOW_EVENTS = {

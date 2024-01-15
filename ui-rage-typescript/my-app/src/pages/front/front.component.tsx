@@ -10,6 +10,7 @@ import Login from "../../components/authentication/login/login.component";
 import { makeToast } from "../../utils/components-used/toast";
 import Register from "../../components/authentication/register/register.component";
 import { ChatWindow } from "../../components/chat/chat.component";
+import { HudComponent } from "../../components/hud/hud.component";
 
 const Front = () => {
   const [windowsOpened, setWindowsOpened] = useState(defaultWindowsOpened);
@@ -38,7 +39,7 @@ const Front = () => {
     window.rpc.on(WINDOW_EVENTS.CLOSE_WINDOW, (windowClosed) => {
       switch (windowClosed) {
         case WINDOW_OPENED.LOGIN: {
-          handleWindowChange([WINDOW_OPENED.LOGIN, WINDOW_OPENED.CHAT]);
+          handleWindowChange([WINDOW_OPENED.LOGIN, WINDOW_OPENED.HUD]);
           break;
         }
         case WINDOW_OPENED.REGISTER: {
@@ -57,7 +58,7 @@ const Front = () => {
   }
   return (
     <div className="front-container">
-      {windowsOpened.chatWindow && (<ChatWindow/>)}
+      {windowsOpened.hudWindow && (<HudComponent/>)}
       {windowsOpened.loginWindow && (
         <Login
           handleRegisterClick={() =>
