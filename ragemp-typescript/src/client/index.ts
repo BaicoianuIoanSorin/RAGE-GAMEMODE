@@ -33,7 +33,7 @@ mp.events.add(PLAYER_CONSTANTS.PLAYERS_READY, () => {
 });
 
 rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
-	mp.players.local.freezePosition(false);
+	player.freezePosition(false);
 	mp.game.ui.setMinimapVisible(true);
 	mp.gui.cursor.show(false, false);
 	setTimeout(() => {
@@ -46,7 +46,7 @@ rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
 let isIntervalSet = false;
 
 mp.events.add('render', async () => {
-    if (mp.players.local.getVariable(PlayersVariables.isLoggedIn) && !isIntervalSet) {
+    if (player.getVariable(PlayersVariables.isLoggedIn) && !isIntervalSet) {
 		
 		// updating and retrieving information about hungry and thirsty level
 		const runTimerForGettinAndUpdatingHungryThirsty = 1 * 60 * 1000; // 3 minutes

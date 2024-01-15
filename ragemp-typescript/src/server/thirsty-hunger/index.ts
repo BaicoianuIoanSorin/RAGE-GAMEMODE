@@ -1,5 +1,6 @@
 import { AppDataSource } from '@/typeorm/typeorm';
 import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
+import { User } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';
 import { ThirstyHungerLevelModel } from '@shared/thirsty-hunger/model';
@@ -24,6 +25,7 @@ rpc.register(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL, async (mes
             hungryLevel: thirstyHunger.hungryLevel
         } as ThirstyHungerLevelModel;
     }
+   
     catch (error: any) {
         console.error(error);
         throw error;
@@ -31,7 +33,7 @@ rpc.register(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL, async (mes
 })
 
 rpc.register(ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL, async (id) => {
-    const userId = mp.players.at(id).getVariable(PlayersVariables.serverId);
+    const userId = mp.players.at(id).getOwnVariable(PlayersVariables.serverId);
     console.log(`${ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL} for user ${userId}`)
 
     try {

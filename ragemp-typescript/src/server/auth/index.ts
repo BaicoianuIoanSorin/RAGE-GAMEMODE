@@ -56,11 +56,11 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		});
 
 		player.health = 100;
-		await rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN, player.id);
+		await rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN, player.name);
 		await rpc.call(
 			AUTH.SERVER_UPDATE_IS_LOGGED_IN,
 			JSON.stringify({
-				playerId: player.id,
+				playerName: player.name,
 				state: true
 			})
 		);
@@ -100,18 +100,12 @@ rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
 	}
 });
 
-rpc.register(AUTH.SERVER_UPDATE_LAST_LOGIN, async (id) => {
-	console.log(`${AUTH.SERVER_UPDATE_LAST_LOGIN} -> ID: ${id}`);
-	const player: PlayerMp | undefined = mp.players.at(id);
-
-	if (!player) {
-		console.log(`Player not found at ${AUTH.SERVER_UPDATE_LAST_LOGIN}`);
-	}
+rpc.register(AUTH.SERVER_UPDATE_LAST_LOGIN, async (playerName) => {
+	console.log(`${AUTH.SERVER_UPDATE_LAST_LOGIN} -> playerName: ${playerName}`);
 
 	try {
-		const userId = player?.getVariable(PlayersVariables.serverId);
-		await userRepository.update({ id: userId }, { lastLoggedIn: new Date() });
-		console.log(`Updated last login for user ${userId}`);
+		await userRepository.update({ username: playerName }, { lastLoggedIn: new Date() });
+		console.log(`Updated last login for playerName ${playerName}`);
 	} catch (error: any) {
 		console.error(`Error at ${AUTH.SERVER_UPDATE_LAST_LOGIN} -> ${error}`);
 	}
@@ -119,18 +113,12 @@ rpc.register(AUTH.SERVER_UPDATE_LAST_LOGIN, async (id) => {
 
 rpc.register(AUTH.SERVER_UPDATE_IS_LOGGED_IN, async (jsonInformation) => {
 	console.log(`${AUTH.SERVER_UPDATE_IS_LOGGED_IN} -> jsonInformation: ${jsonInformation}`);
+
 	const information = JSON.parse(jsonInformation);
-	const player: PlayerMp | undefined = mp.players.at(information.playerId);
-
-	if (!player) {
-		console.log(`Player not found at ${AUTH.SERVER_UPDATE_IS_LOGGED_IN}`);
-	}
-
 	try {
-		const userId = player?.getVariable(PlayersVariables.serverId);
-		await userRepository.update({ id: userId }, { isLoggedIn: information.state });
-		player?.setVariable(PlayersVariables.isLoggedIn, information.state);
-		console.log(`Updated isLoggedIn for user ${userId}`);
+		console.log(`Updating isLoggedIn for playerName ${information.playerName}`);
+		await userRepository.update({ username: information.playerName }, { isLoggedIn: information.state });
+		console.log(`Updated isLoggedIn for playerName ${information.playerName}`);
 	} catch (error: any) {
 		console.error(`Error at ${AUTH.SERVER_UPDATE_IS_LOGGED_IN} -> ${error}`);
 	}

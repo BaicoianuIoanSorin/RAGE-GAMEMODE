@@ -7,7 +7,8 @@ import './commands/utils';
 import './admin';
 import './thirsty-hunger';
 import { PLAYER_CONSTANTS } from '@shared/ragemp-library/events.constants';
-import { SHARED_CONSTANTS } from '@shared/constants';
+import * as rpc from 'rage-rpc';
+import { AUTH } from '@shared/authentication/events.constants';
 
 mp.events.add(PLAYER_CONSTANTS.PLAYERS_READY, (player) => {
 	console.log(`Server: ${player.name} is ready!`);
@@ -21,22 +22,17 @@ mp.events.add(PLAYER_CONSTANTS.PLAYERS_READY, (player) => {
 	// 	player.customMethod();
 });
 
-mp.events.add(PLAYER_CONSTANTS.PLAYER_QUIT, (player) => {
-	// let mySQLDate = convertToMysqlDate(new Date());
+mp.events.add(PLAYER_CONSTANTS.PLAYER_QUIT, async (player, exitType, reason) => {
+	const playerName = player.name;
+	console.log(`Server: ${playerName} has left the server. Type: ${exitType} ${exitType === 'kicked' ? 'Reason: ' + reason : ''}`);
+	// TODO add here event to all players that this player has left the server, depending on the chat
 
-	// databaseConfig
-	// 	.getHandler()
-	// 	.query(
-	// 		`UPDATE player SET last_login = '${mySQLDate}', is_logged_in = 0 WHERE username = '${player.name}'`,
-	// 		(error: any, results: any, fields: any) => {
-	// 			if (error) {
-	// 				console.log(error);
-	// 				return;
-	// 			}
-	// 		}
-	// 	);
-
-	console.log(`Server: ${player.name} has left the server.`);
+	await rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN, playerName);
+	await rpc.call(
+		AUTH.SERVER_UPDATE_IS_LOGGED_IN,
+		JSON.stringify({
+			playerName, 
+			state: false
+		})
+	);
 });
-
-console.log(SHARED_CONSTANTS.HELLO_WORLD);

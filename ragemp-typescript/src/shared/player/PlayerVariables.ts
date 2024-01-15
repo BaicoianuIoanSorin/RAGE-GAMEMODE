@@ -1,6 +1,6 @@
 export const PlayersVariables = {
-    isLoggedIn: 'isLoggedIn',
     serverId: 'serverId',
+    isLoggedIn: 'isLoggedIn',
     Admin: 'admin',
     Helper: 'helper',
 };
