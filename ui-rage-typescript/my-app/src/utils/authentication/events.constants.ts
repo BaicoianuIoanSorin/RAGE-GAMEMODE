@@ -8,8 +8,4 @@ export const AUTH = {
 	SERVER_REGISTER: 'server:playerRegister',
 	SERVER_LOGIN_SUCCES: 'server:playerLoginSucces',
 	SERVER_REGISTER_SUCCES: 'server:playerRegisterSucces',
-
-	// commands
-	CMD_REGISTER: 'register',
-	CMD_LOGIN: 'login',
 }

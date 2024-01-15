@@ -10,8 +10,4 @@ export const AUTH = {
 	CLIENT_UPDATE_LAST_LOGIN: 'client:updateLastLogin',
 	SERVER_UPDATE_IS_LOGGED_IN: 'server:updatedIsLoggedIn',
 	CLIENT_UPDATE_IS_LOGGED_IN: 'client:updatedIsLoggedIn',
-
-	// commands
-	CMD_REGISTER: 'register',
-	CMD_LOGIN: 'login',
 }

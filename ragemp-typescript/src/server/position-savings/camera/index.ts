@@ -1,20 +1,21 @@
 import { findPlayerByName } from "@/utils/players";
 import { CameraInformation } from "@shared/camera/model";
 import { ChatEventInfo } from "@shared/chat/model";
+import { Commands } from "@shared/player/commands";
 import { CAMERA_EVENTS } from "@shared/position-savings/events.constants";
 const fs = require('fs').promises;
 import * as rpc from 'rage-rpc';
 
 const fileSavedPosCam : string = 'savedposcam.txt';
 
-rpc.register(CAMERA_EVENTS.SAVE_CAM, async (argsJSON, info) => {
-    console.log(`${CAMERA_EVENTS.SAVE_CAM} -> ${argsJSON}`);
+rpc.register(Commands.SAVE_CAM, async (argsJSON, info) => {
+    console.log(`command:${Commands.SAVE_CAM} -> ${argsJSON}`);
     
     let args: Array<string> = JSON.parse(argsJSON);
     let name: string = args[0];
     let player: PlayerMp | undefined = findPlayerByName(info.player.name);
     if (!player) {
-        console.error(`${CAMERA_EVENTS.SAVE_CAM} -> ${args} -> player not found`);
+        console.error(`command:${Commands.SAVE_CAM} -> ${args} -> player not found`);
         return;
     }
 

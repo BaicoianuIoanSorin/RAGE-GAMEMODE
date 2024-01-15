@@ -1,19 +1,20 @@
-import fs from 'fs';
-import { ON_FOOT_CAR_EVENTS } from '@shared/position-savings/events.constants';
 import * as rpc from 'rage-rpc';
 import { findPlayerByName } from '@/utils/players';
+import { Commands } from '@shared/player/commands';
 
+const fs = require('fs').promises;
 const saveFile = 'savedpos.txt';
 
-rpc.register(ON_FOOT_CAR_EVENTS.SAVE, (argsJSON, info) => {
-	console.log(`${ON_FOOT_CAR_EVENTS.SAVE} -> ${argsJSON}`);
+rpc.register(Commands.SAVE, async (argsJSON, info) => {
+	console.log(`command:${Commands.SAVE} -> ${argsJSON}`);
 
 	let args: Array<string> = JSON.parse(argsJSON);
 	let name: string = args[0];
+	// TODO later on use info.player.id instead of info.player.name
 	let player: PlayerMp | undefined = findPlayerByName(info.player.name);
 
 	if (!player) {
-		console.error(`${ON_FOOT_CAR_EVENTS.SAVE} -> ${args} -> player not found`);
+		console.error(`command:${Commands.SAVE} -> ${args} -> player not found`);
 		return;
 	}
 	let pos: any = player.vehicle ? player.vehicle.position : player.position;
@@ -25,13 +26,19 @@ rpc.register(ON_FOOT_CAR_EVENTS.SAVE, (argsJSON, info) => {
 	} else {
 		message += ` | Heading: ${player.heading} | OnFoot\n`;
 	}
-	fs.appendFile(saveFile, message, (err: any) => {
-		if (err) {
-            // TODO change this from notify to return inside the ui
-			player?.notify(`~r~SavePos Error: ~w~${err.message}`);
-		} else {
-            // TODO change this from notify to return inside the ui
-			player?.notify(`~g~Position saved. ~w~(${name})`);
+	try {
+		await fs.appendFile(saveFile, message);
+		return {
+			title: 'SavePos',
+			status: 'success',
+			description: `Saved with ${name} name.`
 		}
-	});
+	}
+	catch(error: any) {
+		return {
+			title: 'SavePos',
+			status: 'error',
+			description: error.message
+		}
+	}
 });
