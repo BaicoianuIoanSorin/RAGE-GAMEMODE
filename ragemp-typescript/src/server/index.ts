@@ -5,6 +5,7 @@ import './test';
 import './typeorm/typeorm';
 import './commands/utils';
 import './admin';
+import './thirsty-hunger';
 import { PLAYER_CONSTANTS } from '@shared/ragemp-library/events.constants';
 import { SHARED_CONSTANTS } from '@shared/constants';
 

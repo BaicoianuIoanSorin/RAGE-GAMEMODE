@@ -1,5 +1,6 @@
 import { DataSource } from "typeorm";
 import { User } from "@shared/entity/User";
+import { ThirstyHunger } from "@shared/entity/ThirstyHunger";
 
 // Configure the data source with your connection options
 export const AppDataSource = new DataSource({
@@ -9,8 +10,9 @@ export const AppDataSource = new DataSource({
     username: "admin",
     password: "adminparola",
     database: "ragemp_server_2025_v2",
-    entities: [User], // Include your entity models here
+    entities: [User, ThirstyHunger], // Include your entity models here
     synchronize: true, // Note: Only use in development environment!
+    logging: true,
 	driver: require('mysql2'),
 });
 

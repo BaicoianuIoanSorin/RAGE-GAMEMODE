@@ -1,17 +1,15 @@
 import { AUTH } from '@shared/authentication/events.constants';
-import { LOGIN_LABEL_VECTOR } from '@shared/authentication/objects.constants';
 import { GENERAL_STATUS_CODES, LOGIN_STATUS_CODES } from '@shared/status-codes/status-codes.constants';
 import { SKY_CAMERA } from '@shared/position-savings/events.constants';
 import * as rpc from 'rage-rpc';
 import { AppDataSource } from '@/typeorm/typeorm';
 import { User } from '@shared/entity/User';
+import { PlayersVariables } from '@shared/player/PlayerVariables';
+import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
+import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';
 
-const labelPosition = new mp.Vector3(LOGIN_LABEL_VECTOR.x, LOGIN_LABEL_VECTOR.y, LOGIN_LABEL_VECTOR.z);
-mp.labels.new("Type [/login] for login in. \nIt will automatically register your account, if doesn't exist.", labelPosition, {
-	los: true,
-	font: 1,
-	drawDistance: 10
-});
+const userRepository = AppDataSource.getRepository(User);
+const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHunger);
 
 function isElegible(player: PlayerMp, password: string) {
 	if (!password) {
@@ -44,7 +42,7 @@ mp.events.add(AUTH.SERVER_LOGIN_SUCCES, (player: PlayerMp) => {
 	player.call(SKY_CAMERA.MOVE_SKY_CAMERA, [player, 'down']);
 });
 
-rpc.register(AUTH.SERVER_LOGIN, (formFieldsJSON) => {
+rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 	console.log(AUTH.SERVER_LOGIN);
 	let formFields = JSON.parse(formFieldsJSON);
 	console.log(formFields);
@@ -52,29 +50,34 @@ rpc.register(AUTH.SERVER_LOGIN, (formFieldsJSON) => {
 	let player: PlayerMp = mp.players.at(formFields.playerId);
 	if (!isElegible(player, formFields.password)) return;
 
-	const userRepository = AppDataSource.getRepository(User);
-	return userRepository.findOneBy({ username: player.name }).then((user) => {
+	try {
+		const user: User | null = await userRepository.findOneBy({ username: player.name });
 		if (!user) {
-			player.outputChatBox('Username does not exist.');
 			return LOGIN_STATUS_CODES.USERNAME_IS_NOT_VALID;
 		}
 
 		// TODO hash this password
 		if (user.password !== formFields.password) {
-			player.outputChatBox('Password is wrong.');
 			return LOGIN_STATUS_CODES.PASSWORD_IS_NOT_VALID;
 		}
 
 		player.outputChatBox('You are logged in.');
-		return GENERAL_STATUS_CODES.OK;
-	})
-	.catch((error) => {
-		//TODO NEEDS to be changed to STATUS_CODES.SERVER_ERROR
-		console.log(error);
-		return GENERAL_STATUS_CODES.SERVER_ERROR
-	});
+		// TODO maybe add an util class for player commands inside player shared folder
+		player.setVariables({
+			[PlayersVariables.serverId]: user.id,
+			[PlayersVariables.Admin]: user.admin,
+			[PlayersVariables.Helper]: user.helper
+		});
 
-	// let mySQLDate = convertToMysqlDate(new Date());
+		player.health = 100;
+		rpc.triggerBrowsers(ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL, 'some message, idk i am sending this');
+		rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN);
+		
+		return GENERAL_STATUS_CODES.OK;
+	} catch (error: any) {
+		console.log(error);
+		return GENERAL_STATUS_CODES.SERVER_ERROR;
+	}
 
 	// TODO ADD DATE FOR LAST LOGIN
 	// databaseConfig
@@ -99,18 +102,40 @@ rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
 	let player: PlayerMp = mp.players.at(formFields.playerId);
 	if (!isElegible(player, formFields.password)) return;
 
-	const userRepository = AppDataSource.getRepository(User);
+	try {
+		const playerDatabase = await userRepository.findOneBy({ username: player.name });
 
-	const playerDatabase = await userRepository.findOneBy({ username: player.name });
+		if (playerDatabase) {
+			return LOGIN_STATUS_CODES.USERNAME_IS_NOT_VALID;
+		}
 
-	if (playerDatabase) {
-		player.outputChatBox('Username already exists.');
-		return LOGIN_STATUS_CODES.USERNAME_IS_NOT_VALID;
+		// TODO hash this password
+		const newUser = new User(player.name, formFields.password, formFields.email);
+		await userRepository.save(newUser);
+
+		const newThirstyHunger = new ThirstyHunger(newUser);
+		await thirstyHungerRepository.save(newThirstyHunger);
+		return GENERAL_STATUS_CODES.OK;
+	} catch (error: any) {
+		console.error(`Error at ${AUTH.SERVER_REGISTER} -> ${error}`);
+		return GENERAL_STATUS_CODES.SERVER_ERROR;
+	}
+});
+
+rpc.register(AUTH.SERVER_UPDATE_LAST_LOGIN, async (message, info) => {
+	// not yet playerInfoJSON used
+
+	const player: PlayerMp = mp.players.at(info.player.id);
+
+	if (!player) {
+		console.log(`Player not found at ${AUTH.SERVER_UPDATE_LAST_LOGIN}`);
 	}
 
-	// TODO hash this password
-	const newUser = new User(player.name, formFields.password, formFields.email);
-	await userRepository.save(newUser);
-	player.outputChatBox('You are registered.');
-	return GENERAL_STATUS_CODES.OK;
+	try {
+		const userId = player.getVariable(PlayersVariables.serverId);
+		await userRepository.update({ id: userId }, { lastLoggedIn: new Date() });
+		console.log(`Updated last login for user ${userId}`);
+	} catch (error: any) {
+		console.error(`Error at ${AUTH.SERVER_UPDATE_LAST_LOGIN} -> ${error}`);
+	}
 });

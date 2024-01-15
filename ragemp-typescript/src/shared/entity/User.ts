@@ -5,6 +5,15 @@ export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
+    @Column({ default: false})
+    isLoggedIn: boolean = false;
+
+    @Column({ 
+        type: 'datetime', 
+        default: () => 'CURRENT_TIMESTAMP' 
+    })
+    lastLoggedIn: Date;
+
     @Column()
     username: string;
 
@@ -19,12 +28,6 @@ export class User {
 
     @Column({ default: 0 }) // Default value for helper
     helper: number = 0;
-
-	@Column({default: 100})
-	thirstyLevel: number = 100;
-
-	@Column({default: 100})
-	hungryLevel: number = 100;
 
     constructor(username: string, password: string, email: string) {
         this.username = username;
