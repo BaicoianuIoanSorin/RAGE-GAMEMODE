@@ -1,7 +1,8 @@
 import { ChatEvents } from '@shared/chat/events.constants';
-import { ChatMessage } from '@shared/chat/model';
+import { ChatMessage, TypeMessage } from '@shared/chat/model';
 import { Commands } from '@shared/player/commands';
 import * as rpc from 'rage-rpc';
+import { TreeParent } from 'typeorm';
 
 // TODO maybe make it register such that it can send back to the UI any changes, or if the command is possible
 rpc.register(ChatEvents.CLIENT_CHAT_COMMAND, async (command) => {
@@ -32,7 +33,8 @@ rpc.register(ChatEvents.CLIENT_CHAT_MESSAGE, async (message) => {
         playerId: mp.players.local.id,
         playerName: mp.players.local.name,
         time: new Date().toLocaleTimeString(),
-        message: message
+        message: message,
+        typeMessage: TypeMessage.NORMAL,
     };
     
     await rpc.callServer(ChatEvents.SERVER_CHAT_MESSAGE, JSON.stringify(chatMessage));

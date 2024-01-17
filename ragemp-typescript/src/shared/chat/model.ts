@@ -9,4 +9,10 @@ export interface ChatMessage {
     playerName?: string;
     time: string;
     message: string;
+    typeMessage: TypeMessage;
+}
+
+export enum TypeMessage {
+    NORMAL = 'chat:Normal',
+    ADMIN = 'chat:Admins',
 }

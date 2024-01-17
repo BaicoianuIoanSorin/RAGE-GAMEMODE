@@ -1,11 +1,22 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
-import { ChatMessage } from "../../../../utils/chat/model";
+import { ChatMessage, TypeMessage } from "../../../../utils/chat/model";
+import { get } from "http";
 
 interface ChatMessageProps {
   chatMessage: ChatMessage;
 }
 
 export const ChatMessageComponent = (props: ChatMessageProps) => {
+
+  const getColorBasedOnTypeMessage = (type: TypeMessage) => {
+    switch (type) {
+      case TypeMessage.NORMAL:
+        return "s.500";
+      case TypeMessage.ADMIN:
+        return "red.500";
+    }
+  }
+
   return (
     <VStack align="flex-start" w="full" spacing="1px">
       <HStack justify="space-between" w="full">
@@ -21,7 +32,7 @@ export const ChatMessageComponent = (props: ChatMessageProps) => {
       <Box
         w="full" // Full width
         p="2"
-        bg="blue.500"
+        bg={getColorBasedOnTypeMessage(props.chatMessage.typeMessage)}
         borderRadius="md"
         boxShadow="md"
       >
