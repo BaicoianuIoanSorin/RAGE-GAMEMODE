@@ -3,7 +3,6 @@ import { ChatMessage, TypeMessage } from '@shared/chat/model';
 import { AdminChatCommands, getAllCommandsValues } from '@shared/player/commands';
 import * as rpc from 'rage-rpc';
 
-// TODO maybe make it register such that it can send back to the UI any changes, or if the command is possible
 rpc.register(ChatEvents.CLIENT_CHAT_COMMAND, async (command) => {
     if(!command) return;
 
@@ -22,7 +21,6 @@ rpc.register(ChatEvents.CLIENT_CHAT_COMMAND, async (command) => {
         args = parts.slice(1); 
     }
 
-    // sometimes fail to call the server, so we need to check if the command is valid with a source of truth Command
     if(!getAllCommandsValues().includes(commandName)) {
         mp.console.logError(`${ChatEvents.CLIENT_CHAT_COMMAND} -> commandName: ${commandName}, args: ${args} does not exist`);
         return {
