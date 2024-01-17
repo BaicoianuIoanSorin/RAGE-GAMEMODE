@@ -6,6 +6,7 @@ import './typeorm/typeorm';
 import './commands/utils';
 import './admin';
 import './thirsty-hunger';
+import './chat';
 import { PLAYER_CONSTANTS } from '@shared/ragemp-library/events.constants';
 import * as rpc from 'rage-rpc';
 import { AUTH } from '@shared/authentication/events.constants';

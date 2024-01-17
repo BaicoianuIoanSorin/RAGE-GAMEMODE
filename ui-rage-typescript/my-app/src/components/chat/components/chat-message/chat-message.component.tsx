@@ -1,21 +1,20 @@
 import { Box, HStack, Text, VStack } from "@chakra-ui/react";
+import { ChatMessage } from "../../../../utils/chat/model";
 
 interface ChatMessageProps {
-  time: string;
-  username: string;
-  message: string;
+  chatMessage: ChatMessage;
 }
 
-export const ChatMessage = ({ time, username, message }: ChatMessageProps) => {
+export const ChatMessageComponent = (props: ChatMessageProps) => {
   return (
     <VStack align="flex-start" w="full" spacing="1px">
       <HStack justify="space-between" w="full">
         <HStack>
           <Text fontSize="xs" color="gray.400" isTruncated>
-            {time}
+            {props.chatMessage.time}
           </Text>
           <Text fontWeight="bold" color="gray.200" isTruncated>
-            {username}:
+            {props.chatMessage.playerName}:
           </Text>
         </HStack>
       </HStack>
@@ -27,7 +26,7 @@ export const ChatMessage = ({ time, username, message }: ChatMessageProps) => {
         boxShadow="md"
       >
         <Text color="white">
-          {message}
+          {props.chatMessage.message}
         </Text>
       </Box>
     </VStack>

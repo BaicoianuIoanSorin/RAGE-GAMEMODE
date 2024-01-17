@@ -1,4 +1,5 @@
 import { ChatEvents } from '@shared/chat/events.constants';
+import { ChatMessage } from '@shared/chat/model';
 import { Commands } from '@shared/player/commands';
 import * as rpc from 'rage-rpc';
 
@@ -24,6 +25,21 @@ rpc.register(ChatEvents.CLIENT_CHAT_COMMAND, async (command) => {
     return await rpc.callServer(commandName, JSON.stringify(args));
 });
 
-rpc.register(ChatEvents.CLIENT_CHAT_MESSAGE, (message) => {
+rpc.register(ChatEvents.CLIENT_CHAT_MESSAGE, async (message) => {
     mp.console.logInfo(`${ChatEvents.CLIENT_CHAT_MESSAGE} -> message: ${message}`);
+
+    const chatMessage: ChatMessage = {
+        playerId: mp.players.local.id,
+        playerName: mp.players.local.name,
+        time: new Date().toLocaleTimeString(),
+        message: message
+    };
+    
+    await rpc.callServer(ChatEvents.SERVER_CHAT_MESSAGE, JSON.stringify(chatMessage));
 })
+
+rpc.register(ChatEvents.CLIENT_RECEIVE_MESSAGE, async (chatMessageJSON) => {
+    mp.console.logInfo(`${ChatEvents.CLIENT_RECEIVE_MESSAGE} -> chatMessageJSON: ${chatMessageJSON}`);
+    
+    await rpc.callBrowser(mp.browsers.at(0), ChatEvents.CEF_RECEIVE_MESSAGE, chatMessageJSON);
+});

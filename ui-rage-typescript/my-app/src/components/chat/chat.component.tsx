@@ -1,23 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChatMessage } from "./components/chat-message/chat-message.component";
-import { Message } from "./constants";
 import {
   Box,
-  Input,
-  Button,
   VStack,
   useDisclosure,
-  IconButton,
   useToast,
 } from "@chakra-ui/react";
-import { FaPaperPlane, FaTimes } from "react-icons/fa";
 import { Textarea } from "@chakra-ui/react";
 import { makeToast } from "../../utils/components-used/toast";
 import { ChatEvents } from "../../utils/chat/events.constants";
-import { ChatEventInfo } from "../../utils/chat/model";
+import { ChatEventInfo, ChatMessage } from "../../utils/chat/model";
+import { ChatMessageComponent } from "./components/chat-message/chat-message.component";
 
 export const ChatWindow = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [lastMessageTime, setLastMessageTime] = useState<Date | null>(null);
   const [windowOpacity, setWindowOpacity] = useState(1);
@@ -31,10 +26,10 @@ export const ChatWindow = () => {
   }
 
   // rpc function that is called from client side for adding the message
-  rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (messageJSON: string) => {
-    const message: Message = JSON.parse(messageJSON);
-    setMessages((prevMessages) => {
-      const updatedMessages = [message, ...prevMessages];
+  rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (chatMessageJSON: string) => {
+    const chatMessage: ChatMessage = JSON.parse(chatMessageJSON);
+    setChatMessages((prevMessages) => {
+      const updatedMessages = [chatMessage, ...prevMessages];
       // Keep only the latest 20 messages
       return updatedMessages.slice(0, 20);
     });
@@ -144,12 +139,8 @@ export const ChatWindow = () => {
         flex="1"
         bg="transparent" // Make message background transparent
       >
-        {messages.map((msg, index) => (
-          <ChatMessage
-            key={index}
-            time={msg.time}
-            message={msg.message}
-            username={msg.username}
+        {chatMessages.map((chatMessage, index) => (
+          <ChatMessageComponent key={index} chatMessage={chatMessage}
           />
         ))}
       </VStack>
