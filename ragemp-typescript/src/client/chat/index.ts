@@ -52,3 +52,15 @@ rpc.register(ChatEvents.CLIENT_RECEIVE_MESSAGE, async (chatMessageJSON) => {
     
     await rpc.callBrowser(mp.browsers.at(0), ChatEvents.CEF_RECEIVE_MESSAGE, chatMessageJSON);
 });
+
+// for typing
+rpc.register(ChatEvents.CLIENT_TYPES_MESSAGE, () => {
+    mp.gui.cursor.show(true, true);
+})
+
+rpc.register(ChatEvents.CLIENT_STOPPED_TYPING_MESSAGE, () => {
+
+    // TODO when using ESC to close the chat, it also enters in the game settings
+    // make such that it only closes the chat and not the game settings
+    mp.gui.cursor.show(false, false);
+});

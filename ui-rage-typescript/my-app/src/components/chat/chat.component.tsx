@@ -92,6 +92,7 @@ export const ChatWindow = () => {
       }
       setLastMessageTime(new Date());
       setWindowOpacity(1); // Reset opacity when a new message is sent
+      rpc.callClient(ChatEvents.CLIENT_STOPPED_TYPING);
   };
 
   useEffect(() => {
@@ -101,10 +102,12 @@ export const ChatWindow = () => {
         setWindowOpacity(1); // Set opacity back to 1 when 'T' is pressed
         event.preventDefault();
         setTimeout(() => inputRef.current?.focus(), 0);
+        rpc.callClient(ChatEvents.CLIENT_TYPES_MESSAGE);
         // TODO set player in client side to stop moving
       } else if (event.key === "Escape" && isOpen) {
         // TODO set player in client side to move again
         onToggle();
+        rpc.callClient(ChatEvents.CLIENT_STOPPED_TYPING);
       }
     };
 
