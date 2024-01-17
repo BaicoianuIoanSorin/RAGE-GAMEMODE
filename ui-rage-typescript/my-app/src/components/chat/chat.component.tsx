@@ -25,6 +25,20 @@ export const ChatWindow = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
 
+  let rpc: any = null;
+  if ("rpc" in window && "callClient" in window.rpc) {
+    rpc = window.rpc;
+  }
+
+  // rpc function that is called from client side for adding the message
+  rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (messageJSON: string) => {
+    const message: Message = JSON.parse(messageJSON);
+    setMessages((prevMessages) => {
+      const updatedMessages = [message, ...prevMessages];
+      // Keep only the latest 20 messages
+      return updatedMessages.slice(0, 20);
+    });
+  })
   useEffect(() => {
     // Function to handle the dimming logic
     const dimChatWindow = () => {
@@ -55,44 +69,25 @@ export const ChatWindow = () => {
   
   const handleSend = async () => {
     if (input.trim() === "") return;
-    
-    // Check if the message exceeds 250 characters
+
     if (input.length > 250) {
       console.log("Message cannot exceed 250 characters.");
-      if ("rpc" in window && "callClient" in window.rpc) {
         makeToast(
-          window.rpc,
+          rpc,
           toast,
           "Chat",
           "Message cannot exceed 250 characters.",
           "error"
         );
-      }
-      // Optionally, clear the input or provide visual feedback to the user here.
-      // setInput("");
-      // You might also want to set some error state and display an error message to the user.
       return;
     }
 
     if (input.startsWith("/")) {
-      if ("rpc" in window && "callClient" in window.rpc) {
-        // window.rpc.callClient("chatCommand", input);
-        let chatEventInfo: ChatEventInfo = await window.rpc.callClient(ChatEvents.CHAT_COMMAND, input);
+        let chatEventInfo: ChatEventInfo = await rpc.callClient(ChatEvents.CLIENT_CHAT_COMMAND, input);
         makeToast(window.rpc, toast, chatEventInfo.title, chatEventInfo.description, chatEventInfo.status);
-      }
     }
     else {
-      const newMessage: Message = {
-        time: new Date().toLocaleTimeString().slice(0, -3),
-        username: "YourUsername",
-        message: input,
-      };
-    
-      setMessages((prevMessages) => {
-        const updatedMessages = [newMessage, ...prevMessages];
-        // Keep only the latest 20 messages
-        return updatedMessages.slice(0, 20);
-      });
+        await rpc.callClient(ChatEvents.CLIENT_CHAT_MESSAGE, input);
     }
     setInput("");
       if (isOpen) {
@@ -109,7 +104,9 @@ export const ChatWindow = () => {
         setWindowOpacity(1); // Set opacity back to 1 when 'T' is pressed
         event.preventDefault();
         setTimeout(() => inputRef.current?.focus(), 0);
+        // TODO set player in client side to stop moving
       } else if (event.key === "Escape" && isOpen) {
+        // TODO set player in client side to move again
         onToggle();
       }
     };
