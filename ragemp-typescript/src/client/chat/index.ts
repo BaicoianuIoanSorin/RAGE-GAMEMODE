@@ -11,7 +11,8 @@ rpc.register(ChatEvents.CHAT_COMMAND, async (command) => {
     const args = parts.slice(1);
     
     // sometimes fail to call the server, so we need to check if the command is valid with a source of truth Command
-    if((commandName in Commands) === false) {
+    const commandValue = Object.values(Commands);
+    if(!commandValue.includes(commandName)) {
         mp.console.logError(`${ChatEvents.CHAT_COMMAND} -> commandName: ${commandName}, args: ${args} does not exist`);
         return {
             title: 'Chat Command',

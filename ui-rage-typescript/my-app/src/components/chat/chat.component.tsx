@@ -79,8 +79,6 @@ export const ChatWindow = () => {
         // window.rpc.callClient("chatCommand", input);
         let chatEventInfo: ChatEventInfo = await window.rpc.callClient(ChatEvents.CHAT_COMMAND, input);
         makeToast(window.rpc, toast, chatEventInfo.title, chatEventInfo.description, chatEventInfo.status);
-        
-        
       }
     }
     else {
