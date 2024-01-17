@@ -11,7 +11,7 @@ export const ChatMessageComponent = (props: ChatMessageProps) => {
   const getColorBasedOnTypeMessage = (type: TypeMessage) => {
     switch (type) {
       case TypeMessage.NORMAL:
-        return "s.500";
+        return "blue.500";
       case TypeMessage.ADMIN:
         return "red.500";
     }
