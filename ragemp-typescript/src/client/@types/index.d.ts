@@ -4,6 +4,10 @@ declare global {
 
 		customMethod(): void;
 	}
+
+	interface Vector3 {
+		
+	}
 }
 
 export {};

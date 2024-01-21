@@ -3,6 +3,7 @@
 */
 import { CreatorEvents } from '@shared/character-creation/events.constants';
 import { SKY_CAMERA } from '@shared/position-savings/events.constants';
+import { WINDOW_EVENTS, Window, WindowState } from '@shared/window/windows.constants';
 import * as rpc from 'rage-rpc';
 const Natives = {
 	SWITCH_OUT_PLAYER: '0xAAB3200ED59016BC',
@@ -33,7 +34,26 @@ async function moveFromToAir(player: PlayerMp, moveTo: string, switchType: strin
                 
                 if (!characterExists) {
 					rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
+                    rpc.triggerBrowser(mp.browsers.at(0), WINDOW_EVENTS.CHANGE_STATE_WINDOW,JSON.stringify([
+                        {
+                            windowName: Window.CHARACTER_CREATION,
+                            state: true
+                        },
+                        // TODO delete this when the development of the character creation is finished
+                        {
+                            windowName: Window.HUD,
+                            state: true
+                        }
+                    ] as WindowState[]));
 				}
+                else {
+                    rpc.triggerBrowser(mp.browsers.at(0), WINDOW_EVENTS.CHANGE_STATE_WINDOW,JSON.stringify([
+                        {
+                            windowName: Window.HUD,
+                            state: true
+                        }
+                    ] as WindowState[]));
+                }
 			}
 
 			mp.game.invoke(Natives.SWITCH_IN_PLAYER, player.handle);

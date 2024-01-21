@@ -1,10 +1,17 @@
-export enum WINDOW_OPENED {
+export enum Window {
     REGISTER = 'registerWindow',
     LOGIN = 'loginWindow',
     HUD = 'hudWindow',
+    CHARACTER_CREATION = 'characterCreationWindow',
 }
 
+export interface WindowState {
+    windowName: Window;
+    state: boolean;
+}
+
+export type WindowsMapper = Map<Window, boolean>;
+
 export const WINDOW_EVENTS = {
-    OPEN_WINDOW: 'browser:openWindow',
-    CLOSE_WINDOW: 'browser:closeWindow',
+    CHANGE_STATE_WINDOW: 'browser:changeStateWindow',
 }

@@ -1,12 +1,8 @@
-export interface WindowsOpened {
-  registerWindow: boolean;
-  loginWindow: boolean;
-  hudWindow: boolean;
-}
+import { Window, WindowsMapper } from "../../utils/events-constants/windows.constants";
 
-export const defaultWindowsOpened: WindowsOpened = {
-  registerWindow: false, // only displayed when the player is not logged in
-  loginWindow: false, // only displayed when the player is not logged in
-  // always displayed
-  hudWindow: false,
-};
+export const defaultWindowsOpened:  Map<string, boolean> = new Map<string, boolean>([
+  [Window.REGISTER, false],
+  [Window.LOGIN, false],
+  [Window.HUD, false],
+  [Window.CHARACTER_CREATION, false]
+]);

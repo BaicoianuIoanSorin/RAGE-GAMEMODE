@@ -9,7 +9,7 @@ import './chat';
 import './thirsty-hunger';
 import './character-creation';
 import * as rpc from 'rage-rpc';
-import { WINDOW_EVENTS, WINDOW_OPENED } from '@shared/window/windows.constants';
+import { WINDOW_EVENTS, Window, WindowState } from '@shared/window/windows.constants';
 import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 
@@ -37,7 +37,12 @@ function onBrowserReady(browser: BrowserMp) {
 		mp.gui.cursor.visible = true;
 	}, 0);
 	mp.events.callRemote(AUTH.JOIN);
-	rpc.triggerBrowser(browser, WINDOW_EVENTS.OPEN_WINDOW, WINDOW_OPENED.LOGIN);
+	rpc.triggerBrowser(browser, WINDOW_EVENTS.CHANGE_STATE_WINDOW, JSON.stringify([
+		{
+			windowName: Window.LOGIN,
+			state: true
+		},
+	] as WindowState[]));
 	mp.console.logInfo(PLAYER_CONSTANTS.PLAYERS_READY);
 }
 
@@ -60,7 +65,12 @@ rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
 	mp.gui.cursor.show(false, false);
 	setTimeout(() => {
 		mp.events.callRemote(AUTH.SERVER_LOGIN_SUCCES);
-		rpc.triggerBrowser(browser, WINDOW_EVENTS.CLOSE_WINDOW, WINDOW_OPENED.LOGIN);
+		rpc.triggerBrowser(browser, WINDOW_EVENTS.CHANGE_STATE_WINDOW, JSON.stringify([
+			{
+				windowName: Window.LOGIN,
+				state: false
+			},
+		] as WindowState[]));
 	}, 3000);
 	mp.console.logInfo(AUTH.CLIENT_LOGIN_SUCCES);
 });

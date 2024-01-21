@@ -8,6 +8,9 @@
  * ---------- ACCESSIRIES, CLOTHES, GLOVES, MASKS, WATCHES, BRACELETS, GLASSES, ETC ---------------
  *  See: https://wiki.rage.mp/index.php?title=Player::setComponentVariation
  *
+ * --------- SETTING EYES COLOR --------
+ * setEyeColor: https://wiki.rage.mp/index.php?title=Player::setEyeColor
+ * 
  * ---------- HAIR ---------------
  * setComponentVariation with component ID 2
  * Hair colors: https://wiki.rage.mp/index.php?title=Hair_Colors
@@ -30,8 +33,9 @@
  * - * MORE AFTER THIS *
  */
 import { CreatorEvents } from '@shared/character-creation/events.constants';
-import { CharacterCreationCamera, CharacterCreationCameraFlag } from '@shared/character-creation/model';
+import { CharacterCreationCamera, CharacterCreationCameraFlag, CharacterHeadOverlay } from '@shared/character-creation/model';
 import * as rpc from 'rage-rpc';
+
 
 const player: PlayerMp = mp.players.local;
 let bodyCamera: CameraMp | undefined,
@@ -42,9 +46,11 @@ let bodyCamera: CameraMp | undefined,
 // IF THERE IS, THEN THE CHARACTER WILL BE LOADED AND SOMETHING ELSE HAPPENS
 // IF THERE IS NOT, THEN THE CHARACTER CREATION WILL START, CALLING THIS EVENT
 rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, () => {
+
+    // TODO hire event in browser to close the HUD and chat and show the character creation UI
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
 	if (!player.isPositionFrozen) player.freezePosition(true);
-	mp.gui.cursor.show(true, true);
+    mp.gui.cursor.show(true, true);
 	mp.game.ui.displayRadar(false);
 
 	rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, true);
@@ -68,6 +74,8 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: bool
 		);
 		bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
 		bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+        
+        mp.console.logWarning('pointAtCoord: ' + bodyCameraStartPosition.x + ' ' + bodyCameraStartPosition.y + ' ' + bodyCameraStartPosition.z + characterCreationCamera.height);
 		bodyCamera.setActive(true);
 		mp.game.cam.renderScriptCams(true, false, 500, true, false, 0);
 	} else {
@@ -87,38 +95,62 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 	let characterCreationCamera: CharacterCreationCamera = { angle: 0, distance: 1, height: 0.2 };
 
 	switch (characterCreationCameraFlag) {
-		case CharacterCreationCameraFlag.TORSO: {
-			characterCreationCamera = { angle: 0, distance: 2.6, height: 0.2 };
-			break;
-		}
 		case CharacterCreationCameraFlag.HEAD: {
-			characterCreationCamera = { angle: 0, distance: 1, height: 0.5 };
+			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.6 };
 			break;
 		}
-		case CharacterCreationCameraFlag.HAIR_BEAR_EYEBROWS: {
-			characterCreationCamera = { angle: 0, distance: 0.5, height: 0.7 };
+		case CharacterCreationCameraFlag.BODY: {
+			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.1 };
 			break;
 		}
-		case CharacterCreationCameraFlag.CHEST_HAIR: {
-			characterCreationCamera = { angle: 0, distance: 1, height: 0.2 };
+		case CharacterCreationCameraFlag.LEGS: {
+			characterCreationCamera = { angle: 90, distance: 1, height: -0.5 };
 			break;
 		}
 	}
 
 	if (bodyCameraStartPosition == undefined) return;
-	const cameraPosition = getCameraOffset(
-		new Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
+    
+	const cameraPosition: any | undefined = getCameraOffset(
+		{ x: bodyCameraStartPosition.x, y: bodyCameraStartPosition.y, z: bodyCameraStartPosition.z + characterCreationCamera.height },
 		characterCreationCamera.angle,
 		characterCreationCamera.distance
 	);
 	if (cameraPosition == undefined) return;
 	bodyCamera?.setCoord(cameraPosition?.x, cameraPosition?.y, cameraPosition?.z);
 	bodyCamera?.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+
+    mp.console.logWarning('pointAtCoord: ' + bodyCameraStartPosition.x + ' ' + bodyCameraStartPosition.y + ' ' + bodyCameraStartPosition.z + characterCreationCamera.height);
 });
 
-const getCameraOffset = (position: Vector3, angle: number, distance: number): Vector3 | undefined => {
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
+    rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, JSON.stringify(CharacterCreationCameraFlag.HEAD));
+
+    const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
+    mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
+
+    // until id 9 you can use CharacterCreationCameraFlag.HEAD, from 9 to 11 I need to set the position of the camera on the body and take the clothes off
+    player.setHeadOverlay(characterHeadOverlay.id, characterHeadOverlay.index, characterHeadOverlay.opacity, characterHeadOverlay.primaryColor, characterHeadOverlay.secondaryColor);
+});
+
+const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
 	angle = angle * 0.0174533;
 	position.y = position.y + distance * Math.sin(angle);
 	position.x = position.x + distance * Math.cos(angle);
 	return position;
 };
+
+// for testing purposes
+rpc.register(CreatorEvents.CHANGE_CAMERA_ANGLE, (characterCreationCameraJson) => {
+    let characterCreationCamera: CharacterCreationCamera = JSON.parse(characterCreationCameraJson);
+
+    if (bodyCameraStartPosition == undefined) return;
+    const cameraPosition: any | undefined = getCameraOffset(
+		{ x: bodyCameraStartPosition.x, y: bodyCameraStartPosition.y, z: bodyCameraStartPosition.z + characterCreationCamera.height },
+		characterCreationCamera.angle,
+		characterCreationCamera.distance
+	);
+	if (cameraPosition == undefined) return;
+	bodyCamera?.setCoord(cameraPosition?.x, cameraPosition?.y, cameraPosition?.z);
+	bodyCamera?.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+})
