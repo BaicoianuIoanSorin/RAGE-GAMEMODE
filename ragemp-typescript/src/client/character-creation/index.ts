@@ -10,7 +10,7 @@
  *
  * --------- SETTING EYES COLOR --------
  * setEyeColor: https://wiki.rage.mp/index.php?title=Player::setEyeColor
- * 
+ *
  * ---------- HAIR ---------------
  * setComponentVariation with component ID 2
  * Hair colors: https://wiki.rage.mp/index.php?title=Hair_Colors
@@ -36,7 +36,6 @@ import { CreatorEvents } from '@shared/character-creation/events.constants';
 import { CharacterCreationCamera, CharacterCreationCameraFlag, CharacterHeadOverlay } from '@shared/character-creation/model';
 import * as rpc from 'rage-rpc';
 
-
 const player: PlayerMp = mp.players.local;
 let bodyCamera: CameraMp | undefined,
 	bodyCameraStartPosition: Vector3 | undefined = undefined;
@@ -46,19 +45,15 @@ let bodyCamera: CameraMp | undefined,
 // IF THERE IS, THEN THE CHARACTER WILL BE LOADED AND SOMETHING ELSE HAPPENS
 // IF THERE IS NOT, THEN THE CHARACTER CREATION WILL START, CALLING THIS EVENT
 rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, () => {
-
-    // TODO hire event in browser to close the HUD and chat and show the character creation UI
+	// TODO hire event in browser to close the HUD and chat and show the character creation UI
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
 	if (!player.isPositionFrozen) player.freezePosition(true);
-    mp.gui.cursor.show(true, true);
+	mp.gui.cursor.show(true, true);
 	mp.game.ui.displayRadar(false);
 
 	rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, true);
 
 	// TODO needed?
-	// player.setComponentVariation(11, 15, 0, 0);
-	// player.setComponentVariation(3, 15, 0, 0);
-	// player.setComponentVariation(8, 15, 0, 0);
 });
 
 // todo maybe here call the browser to show the character creation UI
@@ -74,8 +69,16 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: bool
 		);
 		bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
 		bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
-        
-        mp.console.logWarning('pointAtCoord: ' + bodyCameraStartPosition.x + ' ' + bodyCameraStartPosition.y + ' ' + bodyCameraStartPosition.z + characterCreationCamera.height);
+
+		mp.console.logWarning(
+			'pointAtCoord: ' +
+				bodyCameraStartPosition.x +
+				' ' +
+				bodyCameraStartPosition.y +
+				' ' +
+				bodyCameraStartPosition.z +
+				characterCreationCamera.height
+		);
 		bodyCamera.setActive(true);
 		mp.game.cam.renderScriptCams(true, false, 500, true, false, 0);
 	} else {
@@ -97,20 +100,34 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 	switch (characterCreationCameraFlag) {
 		case CharacterCreationCameraFlag.HEAD: {
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.6 };
+
+            // TODO investigate how to get its initial clothes before setting them
+            player.setComponentVariation(11, 15, 0, 1);
+			player.setComponentVariation(3, 15, 0, 1);
+			player.setComponentVariation(8, 15, 0, 1);
+            player.setComponentVariation(4, 15, 0, 1);
 			break;
 		}
 		case CharacterCreationCameraFlag.BODY: {
-			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.1 };
+			// TODO investigate how to get its initial clothes before setting them
+            player.setComponentVariation(11, 15, 0, 0);
+			player.setComponentVariation(3, 15, 0, 0);
+			player.setComponentVariation(8, 15, 0, 0);
+
+			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.2 };
 			break;
 		}
 		case CharacterCreationCameraFlag.LEGS: {
+
+            // TODO investigate how to get its initial clothes before setting them
+            player.setComponentVariation(4, 15, 0, 0);
 			characterCreationCamera = { angle: 90, distance: 1, height: -0.5 };
 			break;
 		}
 	}
 
 	if (bodyCameraStartPosition == undefined) return;
-    
+
 	const cameraPosition: any | undefined = getCameraOffset(
 		{ x: bodyCameraStartPosition.x, y: bodyCameraStartPosition.y, z: bodyCameraStartPosition.z + characterCreationCamera.height },
 		characterCreationCamera.angle,
@@ -120,18 +137,40 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 	bodyCamera?.setCoord(cameraPosition?.x, cameraPosition?.y, cameraPosition?.z);
 	bodyCamera?.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
 
-    mp.console.logWarning('pointAtCoord: ' + bodyCameraStartPosition.x + ' ' + bodyCameraStartPosition.y + ' ' + bodyCameraStartPosition.z + characterCreationCamera.height);
+	mp.console.logWarning(
+		'pointAtCoord: ' +
+			bodyCameraStartPosition.x +
+			' ' +
+			bodyCameraStartPosition.y +
+			' ' +
+			bodyCameraStartPosition.z +
+			characterCreationCamera.height
+	);
 });
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
-    rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, JSON.stringify(CharacterCreationCameraFlag.HEAD));
+	const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
 
-    const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
-    mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
+	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
 
-    // until id 9 you can use CharacterCreationCameraFlag.HEAD, from 9 to 11 I need to set the position of the camera on the body and take the clothes off
-    player.setHeadOverlay(characterHeadOverlay.id, characterHeadOverlay.index, characterHeadOverlay.opacity, characterHeadOverlay.primaryColor, characterHeadOverlay.secondaryColor);
+	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 8) {
+		rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, JSON.stringify(CharacterCreationCameraFlag.HEAD));
+	} else if (characterHeadOverlay.id >= 9 && characterHeadOverlay.id <= 12) {
+		rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, JSON.stringify(CharacterCreationCameraFlag.BODY));
+	}
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
+
+	// until id 9 you can use CharacterCreationCameraFlag.HEAD, from 9 to 11 I need to set the position of the camera on the body and take the clothes off
+	player.setHeadOverlay(
+		characterHeadOverlay.id,
+		characterHeadOverlay.index,
+		characterHeadOverlay.opacity,
+		characterHeadOverlay.primaryColor,
+		characterHeadOverlay.secondaryColor
+	);
 });
+
+// TODO adding rest of the events for setting the character - look through the above documentation
 
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
 	angle = angle * 0.0174533;
@@ -142,10 +181,10 @@ const getCameraOffset = (position: any, angle: number, distance: number): any | 
 
 // for testing purposes
 rpc.register(CreatorEvents.CHANGE_CAMERA_ANGLE, (characterCreationCameraJson) => {
-    let characterCreationCamera: CharacterCreationCamera = JSON.parse(characterCreationCameraJson);
+	let characterCreationCamera: CharacterCreationCamera = JSON.parse(characterCreationCameraJson);
 
-    if (bodyCameraStartPosition == undefined) return;
-    const cameraPosition: any | undefined = getCameraOffset(
+	if (bodyCameraStartPosition == undefined) return;
+	const cameraPosition: any | undefined = getCameraOffset(
 		{ x: bodyCameraStartPosition.x, y: bodyCameraStartPosition.y, z: bodyCameraStartPosition.z + characterCreationCamera.height },
 		characterCreationCamera.angle,
 		characterCreationCamera.distance
@@ -153,4 +192,4 @@ rpc.register(CreatorEvents.CHANGE_CAMERA_ANGLE, (characterCreationCameraJson) =>
 	if (cameraPosition == undefined) return;
 	bodyCamera?.setCoord(cameraPosition?.x, cameraPosition?.y, cameraPosition?.z);
 	bodyCamera?.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
-})
+});
