@@ -7,6 +7,7 @@ import './player';
 import './commands/utils';
 import './chat';
 import './thirsty-hunger';
+import './character-creation';
 import * as rpc from 'rage-rpc';
 import { WINDOW_EVENTS, WINDOW_OPENED } from '@shared/window/windows.constants';
 import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';

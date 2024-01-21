@@ -1,23 +1,18 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChatMessage } from "./components/chat-message/chat-message.component";
-import { Message } from "./constants";
 import {
   Box,
-  Input,
-  Button,
   VStack,
   useDisclosure,
-  IconButton,
   useToast,
 } from "@chakra-ui/react";
-import { FaPaperPlane, FaTimes } from "react-icons/fa";
 import { Textarea } from "@chakra-ui/react";
 import { makeToast } from "../../utils/components-used/toast";
 import { ChatEvents } from "../../utils/chat/events.constants";
-import { ChatEventInfo } from "../../utils/chat/model";
+import { ChatEventInfo, ChatMessage } from "../../utils/chat/model";
+import { ChatMessageComponent } from "./components/chat-message/chat-message.component";
 
 export const ChatWindow = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [lastMessageTime, setLastMessageTime] = useState<Date | null>(null);
   const [windowOpacity, setWindowOpacity] = useState(1);
@@ -25,6 +20,20 @@ export const ChatWindow = () => {
   const inputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
 
+  let rpc: any = null;
+  if ("rpc" in window && "callClient" in window.rpc) {
+    rpc = window.rpc;
+  }
+
+  // rpc function that is called from client side for adding the message
+  rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (chatMessageJSON: string) => {
+    const chatMessage: ChatMessage = JSON.parse(chatMessageJSON);
+    setChatMessages((prevMessages) => {
+      const updatedMessages = [chatMessage, ...prevMessages];
+      // Keep only the latest 20 messages
+      return updatedMessages.slice(0, 20);
+    });
+  })
   useEffect(() => {
     // Function to handle the dimming logic
     const dimChatWindow = () => {
@@ -55,46 +64,27 @@ export const ChatWindow = () => {
   
   const handleSend = async () => {
     if (input.trim() === "") return;
-    
-    // Check if the message exceeds 250 characters
+
     if (input.length > 250) {
       console.log("Message cannot exceed 250 characters.");
-      if ("rpc" in window && "callClient" in window.rpc) {
         makeToast(
-          window.rpc,
+          rpc,
           toast,
           "Chat",
           "Message cannot exceed 250 characters.",
           "error"
         );
-      }
-      // Optionally, clear the input or provide visual feedback to the user here.
-      // setInput("");
-      // You might also want to set some error state and display an error message to the user.
       return;
     }
 
     if (input.startsWith("/")) {
-      if ("rpc" in window && "callClient" in window.rpc) {
-        // window.rpc.callClient("chatCommand", input);
-        let chatEventInfo: ChatEventInfo = await window.rpc.callClient(ChatEvents.CHAT_COMMAND, input);
-        makeToast(window.rpc, toast, chatEventInfo.title, chatEventInfo.description, chatEventInfo.status);
-        
-        
-      }
+        let chatEventInfo: ChatEventInfo = await rpc.callClient(ChatEvents.CLIENT_CHAT_COMMAND, input);
+        if(chatEventInfo !== undefined) {
+          makeToast(window.rpc, toast, chatEventInfo.title, chatEventInfo.description, chatEventInfo.status);
+        }
     }
     else {
-      const newMessage: Message = {
-        time: new Date().toLocaleTimeString().slice(0, -3),
-        username: "YourUsername",
-        message: input,
-      };
-    
-      setMessages((prevMessages) => {
-        const updatedMessages = [newMessage, ...prevMessages];
-        // Keep only the latest 20 messages
-        return updatedMessages.slice(0, 20);
-      });
+        await rpc.callClient(ChatEvents.CLIENT_CHAT_MESSAGE, input);
     }
     setInput("");
       if (isOpen) {
@@ -102,6 +92,7 @@ export const ChatWindow = () => {
       }
       setLastMessageTime(new Date());
       setWindowOpacity(1); // Reset opacity when a new message is sent
+      rpc.callClient(ChatEvents.CLIENT_STOPPED_TYPING);
   };
 
   useEffect(() => {
@@ -111,8 +102,12 @@ export const ChatWindow = () => {
         setWindowOpacity(1); // Set opacity back to 1 when 'T' is pressed
         event.preventDefault();
         setTimeout(() => inputRef.current?.focus(), 0);
+        rpc.callClient(ChatEvents.CLIENT_TYPES_MESSAGE);
+        // TODO set player in client side to stop moving
       } else if (event.key === "Escape" && isOpen) {
+        // TODO set player in client side to move again
         onToggle();
+        rpc.callClient(ChatEvents.CLIENT_STOPPED_TYPING);
       }
     };
 
@@ -149,12 +144,8 @@ export const ChatWindow = () => {
         flex="1"
         bg="transparent" // Make message background transparent
       >
-        {messages.map((msg, index) => (
-          <ChatMessage
-            key={index}
-            time={msg.time}
-            message={msg.message}
-            username={msg.username}
+        {chatMessages.map((chatMessage, index) => (
+          <ChatMessageComponent key={index} chatMessage={chatMessage}
           />
         ))}
       </VStack>

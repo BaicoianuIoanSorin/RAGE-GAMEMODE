@@ -9,7 +9,6 @@ import { useState } from "react";
 import Login from "../../components/authentication/login/login.component";
 import { makeToast } from "../../utils/components-used/toast";
 import Register from "../../components/authentication/register/register.component";
-import { ChatWindow } from "../../components/chat/chat.component";
 import { HudComponent } from "../../components/hud/hud.component";
 
 const Front = () => {
