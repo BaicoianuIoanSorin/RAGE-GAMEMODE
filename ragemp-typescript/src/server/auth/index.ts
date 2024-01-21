@@ -26,7 +26,7 @@ mp.events.add(AUTH.JOIN, (player: PlayerMp) => {
 
 mp.events.add(AUTH.SERVER_LOGIN_SUCCES, (player: PlayerMp) => {
 	console.log(AUTH.SERVER_LOGIN_SUCCES);
-	player.call(SKY_CAMERA.MOVE_SKY_CAMERA, [player, 'down']);
+	player.call(SKY_CAMERA.MOVE_SKY_CAMERA, [player, 'down', null, true]);
 });
 
 rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {

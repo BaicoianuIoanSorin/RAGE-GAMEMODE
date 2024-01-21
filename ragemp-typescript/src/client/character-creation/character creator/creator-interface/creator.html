@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- meta tags-->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+        <!-- source -->
+        <link rel="stylesheet" type="text/css" href="src/vendor/css/fonts.css" />
+        <link rel="stylesheet" type="text/css" href="src/vendor/css/font-awesome.css" />
+
+        <link rel="stylesheet" type="text/css" href="src/style.css" />
+
+    </head>
+    <body>
+
+        <div class="creator">
+            <ul class="navigation">
+                <li onclick="sliders.open(0)"> <i class="fa fa-info-circle" aria-hidden="true"></i> </li>
+                <li onclick="sliders.open(1)"> <i class="fas fa-dna"></i> </li>
+                <li onclick="sliders.open(2)"> <i class="fas fa-user"></i> </li>
+                <li onclick="sliders.open(3)"> <i class="fas fa-user-tie"></i> </li>
+                <li onclick="sliders.open(4)"> <i class="fa fa-circle" aria-hidden="true"></i> </li>
+                <li onclick="sliders.open(5)"> <i class="fa fa-flag-checkered" aria-hidden="true"></i> </li>
+
+            </ul>
+
+            <div class="handler">
+                <div class="slides">
+                    <div class="slide">
+                        <div class="header bg-1">
+                            <h2 data-before="Osnovne Informacije">Identitet</h2>
+                        </div>
+
+                        <div class="form-control">
+                            <label>Ime Karaktera</label>
+                            <input type="text" id="character-first-name" oninput="character.firstname = this.value" placeholder="John"/>
+                        </div>
+
+                        <div class="form-control">
+                            <label>Prezime Karaktera</label>
+                            <input type="text" id="character-last-name" oninput="character.lastname = this.value" placeholder="Doe" />
+                        </div>  
+
+                        <div class="form-control">
+                            <label>Datum Rodjenja</label>
+                            <input class="unstyled" type="date" id="char-birth-date" min="1918-01-01" max="2001-01-30" />
+                        </div>
+
+                        <div class="form-control">
+                            <label>Poreklo Karaktera</label>
+                            <input type="text" id="character-origin" oninput="character.origin = this.value" placeholder="npr. Los Santos, Paleto Bay..."/>
+                        </div>
+
+                        <div class="genders">
+                            <label>Pol Karaktera</label>
+                            <h2 onclick='gender(this, 0)'>Muško</h2>
+                            <h2 onclick='gender(this, 1)'>Žensko</h2>
+                        </div>
+
+                        <p class="help">
+                            Na sledećim stranicama se nalaze razna podešavanja karaktera, od izgleda do odeće.
+                            Rotaciju karaktera možete vršiti na tipke <b>A</b> i <b>B</b>.
+                        </p>
+                    </div>
+
+                    <div class="slide">
+                        <div class="header bg-2">
+                            <h2 data-before="Genetika Karaktera">Genetika</h2>
+                        </div>
+
+                        <div class="dna">
+                            <div class="blendData"> </div>
+
+                            <div class="hair">
+                                <label>Stil kose</label>
+                                <input type="range" class='slider' oninput="customize('hair', 0, this.value)" value="0" max="75">
+                                <datalist id="hairStyles"> </datalist>
+    
+                                <div class="hairStyle"> </div>
+                                <label>Boja Kose</label>
+                                <ul class="hairColors-1"> </ul>
+                                <label>Presijavanje Kose</label>
+                                <ul class="hairColors-2"> </ul>
+                            </div>
+
+                            <div class="beard">
+                                <label>Stil brade</label>
+                                <button class="btn" onclick="customize('beard', 0, 255)">ukloni bradu</button>
+                                <input type="range" class='slider' oninput="customize('beard', 0, this.value)" value="0" max="28">
+                                <label>Boja brade</label>
+                                <ul class="beardColors"> </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="slide">
+                        <div class="header bg-3">
+                            <h2 data-before="Struktura, Crte Lica">Oblik Lica</h2>
+                        </div>
+                        <div class="faceFeatures"> </div>
+
+                    </div>
+
+                    <div class="slide">
+                        <div class="header bg-3">
+                            <h2 data-before="Osnovna Odeća">Odeća</h2>
+                        </div>
+                        <div class="clothing"> </div>
+                    </div>
+
+                    <div class="slide">
+                        <div class="header bg-3">
+                            <h2 data-before="Detalji lica i tela">Detalji</h2>
+                        </div>
+                        <div class="headOverlays"> </div>
+                    </div>
+
+                    <div class="slide">
+                        <div class="finish">
+                            <img src="src/images/logo.png" />
+                            <button onclick="customization.finish()">Kreiraj Karaktera</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- scripts -->
+        <script src="src/vendor/js/jquery-3.5.1.js"></script>
+        <script src="src/app.js"></script>
+    </body>     
+</html>

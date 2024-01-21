@@ -2,22 +2,22 @@
  * ---------- FACE ---------------
  * setHeadOverlay: https://wiki.rage.mp/index.php?title=Player::setHeadOverlay
  * All colors used are the hair colors: https://wiki.rage.mp/index.php?title=Hair_Colors
- * 
+ *
  * --------- SETTING FACE FEATURE -----------
  * setFaceFeature: https://wiki.rage.mp/index.php?title=Player::setFaceFeature
  * ---------- ACCESSIRIES, CLOTHES, GLOVES, MASKS, WATCHES, BRACELETS, GLASSES, ETC ---------------
  *  See: https://wiki.rage.mp/index.php?title=Player::setComponentVariation
- * 
+ *
  * ---------- HAIR ---------------
  * setComponentVariation with component ID 2
  * Hair colors: https://wiki.rage.mp/index.php?title=Hair_Colors
  * Mail hair styles: https://wiki.rage.mp/index.php?title=Male_Hair_Styles
  * Female hair styles: https://wiki.rage.mp/index.php?title=Female_Hair_Styles
- * 
+ *
  * --------------- GENE FROM PARENTS ---------------
  * setHeadBlend: https://wiki.rage.mp/index.php?title=Player::setHeadBlend
  * ALL MOTHER SHAPES AND FATHER SHAPES PLUS HOW TO USE IT -> https://gtaforums.com/topic/858970-all-gtao-face-ids-pedset_ped_head_blend_data-explained/
- * 
+ *
  * -------------------------------------------------
  * TODO LIST:
  * - Make a method in client side for setting these things manually to test it out
@@ -29,3 +29,96 @@
  * - Add all photos of mother shapes and father shapes in the frontend side of the character creator
  * - * MORE AFTER THIS *
  */
+import { CreatorEvents } from '@shared/character-creation/events.constants';
+import { CharacterCreationCamera, CharacterCreationCameraFlag } from '@shared/character-creation/model';
+import * as rpc from 'rage-rpc';
+
+const player: PlayerMp = mp.players.local;
+let bodyCamera: CameraMp | undefined,
+	bodyCameraStartPosition: Vector3 | undefined = undefined;
+
+// THIS EVENT WILL BE CALLED AFTER THE CAMERA GOES DOWN
+// WHEN THE CAMERA GOES DOWN, ANOTHER EVENT IN SERVER IS CALLED TO SEE IF THERE IS ALREADY SOME CHARACTER INFORMATION SAVED BY THE USER ID
+// IF THERE IS, THEN THE CHARACTER WILL BE LOADED AND SOMETHING ELSE HAPPENS
+// IF THERE IS NOT, THEN THE CHARACTER CREATION WILL START, CALLING THIS EVENT
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, () => {
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
+	if (!player.isPositionFrozen) player.freezePosition(true);
+	mp.gui.cursor.show(true, true);
+	mp.game.ui.displayRadar(false);
+
+	rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, true);
+
+	// TODO needed?
+	// player.setComponentVariation(11, 15, 0, 0);
+	// player.setComponentVariation(3, 15, 0, 0);
+	// player.setComponentVariation(8, 15, 0, 0);
+});
+
+// todo maybe here call the browser to show the character creation UI
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: boolean) => {
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_SET + ' ' + showCharacterCamera);
+	if (showCharacterCamera) {
+		bodyCameraStartPosition = player.position;
+		let characterCreationCamera: CharacterCreationCamera = { angle: player.getRotation(2).z + 90, distance: 2.6, height: 0.2 };
+		let pos = getCameraOffset(
+			new mp.Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
+			characterCreationCamera.angle,
+			characterCreationCamera.distance
+		);
+		bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
+		bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+		bodyCamera.setActive(true);
+		mp.game.cam.renderScriptCams(true, false, 500, true, false, 0);
+	} else {
+		if (bodyCamera == undefined) return;
+		bodyCamera.setActive(false);
+		bodyCamera.destroy();
+		mp.game.cam.renderScriptCams(false, false, 3000, true, true, 0);
+
+		bodyCamera = undefined;
+	}
+	player.taskPlayAnim('amb@world_human_guard_patrol@male@base', 'base', 8.0, 1, -1, 1, 0.0, false, false, false);
+});
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagJson: string) => {
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT + ' ' + characterCreationCameraFlagJson);
+
+	const characterCreationCameraFlag: CharacterCreationCameraFlag = JSON.parse(characterCreationCameraFlagJson);
+	let characterCreationCamera: CharacterCreationCamera = { angle: 0, distance: 1, height: 0.2 };
+
+	switch (characterCreationCameraFlag) {
+		case CharacterCreationCameraFlag.TORSO: {
+			characterCreationCamera = { angle: 0, distance: 2.6, height: 0.2 };
+			break;
+		}
+		case CharacterCreationCameraFlag.HEAD: {
+			characterCreationCamera = { angle: 0, distance: 1, height: 0.5 };
+			break;
+		}
+		case CharacterCreationCameraFlag.HAIR_BEAR_EYEBROWS: {
+			characterCreationCamera = { angle: 0, distance: 0.5, height: 0.7 };
+			break;
+		}
+		case CharacterCreationCameraFlag.CHEST_HAIR: {
+			characterCreationCamera = { angle: 0, distance: 1, height: 0.2 };
+			break;
+		}
+	}
+
+	if (bodyCameraStartPosition == undefined) return;
+	const cameraPosition = getCameraOffset(
+		new Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
+		characterCreationCamera.angle,
+		characterCreationCamera.distance
+	);
+	if (cameraPosition == undefined) return;
+	bodyCamera?.setCoord(cameraPosition?.x, cameraPosition?.y, cameraPosition?.z);
+	bodyCamera?.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+});
+
+const getCameraOffset = (position: Vector3, angle: number, distance: number): Vector3 | undefined => {
+	angle = angle * 0.0174533;
+	position.y = position.y + distance * Math.sin(angle);
+	position.x = position.x + distance * Math.cos(angle);
+	return position;
+};
