@@ -33,10 +33,17 @@
  * - * MORE AFTER THIS *
  */
 import { CreatorEvents } from '@shared/character-creation/events.constants';
-import { CharacterCreationCamera, CharacterCreationCameraFlag, CharacterHeadOverlay } from '@shared/character-creation/model';
+import {
+	CharacterComponentVariation,
+	CharacterCreationCamera,
+	CharacterCreationCameraFlag,
+	CharacterCreationCameraFlagModel,
+	CharacterHeadOverlay
+} from '@shared/character-creation/model';
 import * as rpc from 'rage-rpc';
 
 const player: PlayerMp = mp.players.local;
+let componentVariations: CharacterComponentVariation[] = [];
 let bodyCamera: CameraMp | undefined,
 	bodyCameraStartPosition: Vector3 | undefined = undefined;
 
@@ -44,16 +51,21 @@ let bodyCamera: CameraMp | undefined,
 // WHEN THE CAMERA GOES DOWN, ANOTHER EVENT IN SERVER IS CALLED TO SEE IF THERE IS ALREADY SOME CHARACTER INFORMATION SAVED BY THE USER ID
 // IF THERE IS, THEN THE CHARACTER WILL BE LOADED AND SOMETHING ELSE HAPPENS
 // IF THERE IS NOT, THEN THE CHARACTER CREATION WILL START, CALLING THIS EVENT
-rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, () => {
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
 	// TODO hire event in browser to close the HUD and chat and show the character creation UI
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
 	if (!player.isPositionFrozen) player.freezePosition(true);
 	mp.gui.cursor.show(true, true);
 	mp.game.ui.displayRadar(false);
 
-	rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, true);
+	for (let i = 0; i < 12; i++) {
+		let componentVariation: CharacterComponentVariation = await rpc.callServer(CreatorEvents.SERVER_GET_COMPONENT_VARIATION, i);
+		mp.console.logWarning('componentVariation: ' + JSON.stringify(componentVariation));
+		if (componentVariation == undefined) continue;
+		componentVariations.push(componentVariation);
+	}
 
-	// TODO needed?
+	rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, true);
 });
 
 // todo maybe here call the browser to show the character creation UI
@@ -91,37 +103,42 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: bool
 	}
 	player.taskPlayAnim('amb@world_human_guard_patrol@male@base', 'base', 8.0, 1, -1, 1, 0.0, false, false, false);
 });
-rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagJson: string) => {
-	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT + ' ' + characterCreationCameraFlagJson);
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagModelJson: string) => {
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT + ' ' + characterCreationCameraFlagModelJson);
 
-	const characterCreationCameraFlag: CharacterCreationCameraFlag = JSON.parse(characterCreationCameraFlagJson);
+	const characterCreationCameraFlagModel: CharacterCreationCameraFlagModel = JSON.parse(characterCreationCameraFlagModelJson);
 	let characterCreationCamera: CharacterCreationCamera = { angle: 0, distance: 1, height: 0.2 };
 
-	switch (characterCreationCameraFlag) {
+	switch (characterCreationCameraFlagModel.characterCreationCameraFlag) {
 		case CharacterCreationCameraFlag.HEAD: {
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.6 };
 
-            // TODO investigate how to get its initial clothes before setting them
-            player.setComponentVariation(11, 15, 0, 1);
-			player.setComponentVariation(3, 15, 0, 1);
-			player.setComponentVariation(8, 15, 0, 1);
-            player.setComponentVariation(4, 15, 0, 1);
+			if (characterCreationCameraFlagModel.withRemovingComponentVariations) {
+				player.setDefaultComponentVariation();
+			}
+
 			break;
 		}
 		case CharacterCreationCameraFlag.BODY: {
-			// TODO investigate how to get its initial clothes before setting them
-            player.setComponentVariation(11, 15, 0, 0);
-			player.setComponentVariation(3, 15, 0, 0);
-			player.setComponentVariation(8, 15, 0, 0);
-
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.2 };
+
+			if (characterCreationCameraFlagModel.withRemovingComponentVariations) {
+				player.setDefaultComponentVariation();
+
+				player.setComponentVariation(11, 15, 0, 0);
+				player.setComponentVariation(3, 15, 0, 0);
+				player.setComponentVariation(8, 15, 0, 0);
+			}
+
 			break;
 		}
 		case CharacterCreationCameraFlag.LEGS: {
-
-            // TODO investigate how to get its initial clothes before setting them
-            player.setComponentVariation(4, 15, 0, 0);
 			characterCreationCamera = { angle: 90, distance: 1, height: -0.5 };
+
+			if (characterCreationCameraFlagModel.withRemovingComponentVariations) {
+				player.setDefaultComponentVariation();
+				player.setComponentVariation(4, 15, 0, 0);
+			}
 			break;
 		}
 	}
@@ -154,9 +171,21 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
 
 	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 8) {
-		rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, JSON.stringify(CharacterCreationCameraFlag.HEAD));
+		rpc.call(
+			CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
+			JSON.stringify({
+				characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+				withRemovingComponentVariations: true
+			} as CharacterCreationCameraFlagModel)
+		);
 	} else if (characterHeadOverlay.id >= 9 && characterHeadOverlay.id <= 12) {
-		rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, JSON.stringify(CharacterCreationCameraFlag.BODY));
+		rpc.call(
+			CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
+			JSON.stringify({
+				characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
+				withRemovingComponentVariations: true
+			} as CharacterCreationCameraFlagModel)
+		);
 	}
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
 

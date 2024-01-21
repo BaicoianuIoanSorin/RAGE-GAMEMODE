@@ -1,7 +1,7 @@
 import { AppDataSource } from '@/typeorm/typeorm';
 import { findPlayerByName } from '@/utils/players';
 import { CreatorEvents } from '@shared/character-creation/events.constants';
-import { CharacterCreationCamera, CharacterHeadOverlay } from '@shared/character-creation/model';
+import { CharacterComponentVariation, CharacterCreationCamera, CharacterHeadOverlay } from '@shared/character-creation/model';
 import { Character } from '@shared/entity/Character';
 import { User } from '@shared/entity/User';
 import { CharacterCreationCommands } from '@shared/player/commands';
@@ -64,3 +64,22 @@ rpc.register(CharacterCreationCommands.CHANGE_CAMERA_ANGLE, async (argsJSON, inf
 
     return await rpc.callClient(player, CreatorEvents.CHANGE_CAMERA_ANGLE, JSON.stringify(characterCreationCamera));
 });
+
+rpc.register(CreatorEvents.SERVER_GET_COMPONENT_VARIATION, (componentId: number, info) => {
+    console.log(`${CreatorEvents.SERVER_GET_COMPONENT_VARIATION} -> componentId:${componentId}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_GET_COMPONENT_VARIATION} -> ${componentId} -> player not found`);
+        return;
+    }
+
+    const { drawable, texture, palette } = player.getClothes(componentId);
+    return {
+        componentId,
+        drawable,
+        texture,
+        palette,
+    } as CharacterComponentVariation;
+})

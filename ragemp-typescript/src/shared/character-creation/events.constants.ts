@@ -6,6 +6,7 @@ export enum CreatorEvents {
 
     // setting things to the player
     CLIENT_CREATOR_SET_HEAD_OVERLAY = 'client:CreatorSetHeadOverlay',
+    SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 
     // testing purposes
     CHANGE_CAMERA_ANGLE = 'client:changeCameraAngle',

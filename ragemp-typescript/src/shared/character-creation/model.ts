@@ -18,3 +18,14 @@ export interface CharacterHeadOverlay {
     secondaryColor: number;
 }
 
+export interface CharacterComponentVariation {
+    componentId: number;
+    drawable: number;
+    texture: number;
+    palette: number;
+}
+
+export interface CharacterCreationCameraFlagModel {
+    characterCreationCameraFlag: CharacterCreationCameraFlag;
+    withRemovingComponentVariations: boolean;
+}
