@@ -260,14 +260,6 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreat
 			// TODO not implemented
 			return;
 		}
-		case CharacterCreationScope.FACE_FEATURE: {
-			const faceFeature: CharacterFaceFeature = {
-				id: characterCreationData.id,
-				scale: characterCreationData.valueChoosen,
-			} as CharacterFaceFeature;
-			rpc.call(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, JSON.stringify(faceFeature));
-			break;	
-		};
 	}
 });
 
