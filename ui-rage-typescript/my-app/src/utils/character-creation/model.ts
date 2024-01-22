@@ -169,6 +169,16 @@ export const COLORS: Map<number, string> = new Map([
          valueChoosen?: number;
      }
  
+     export const characterCreationDataNotSupportedForColours: CharacterCreationData[] = [
+                    { name: "Blemishes", scope: CharacterCreationScope.HEAD_OVERLAY, id: 0, minValue: 0, maxValue: 23 },
+                    { name: "Ageing", scope: CharacterCreationScope.HEAD_OVERLAY, id: 3, minValue: 0, maxValue: 14 },
+                    { name: "Makeup", scope: CharacterCreationScope.HEAD_OVERLAY, id: 4, minValue: 0, maxValue: 74 },
+                    { name: "Complexion", scope: CharacterCreationScope.HEAD_OVERLAY, id: 6, minValue: 0, maxValue: 11 },
+                    { name: "Sun Damage", scope: CharacterCreationScope.HEAD_OVERLAY, id: 7, minValue: 0, maxValue: 10 },
+                    { name: "Moles & Freckles", scope: CharacterCreationScope.HEAD_OVERLAY, id: 9, minValue: 0, maxValue: 17 },
+                    { name: "Body Blemishes", scope: CharacterCreationScope.HEAD_OVERLAY, id: 11, minValue: 0, maxValue: 11 },
+                ];
+        
      export const CHARACTER_CREATION_DATA: Map<CharacterCreationScope, Map<string, CharacterCreationData>> = new Map(
          [
              [
@@ -235,14 +245,22 @@ export const COLORS: Map<number, string> = new Map([
          return result;
      };
 
-     export const CHARACTER_CREATION_FACE_FEATURES = (): CharacterCreationData[] => {
+     export const CHARACTER_CREATION_BY_SCOPE = (byScope: CharacterCreationScope, withNotSupportedForColours: boolean): CharacterCreationData[] => {
         const result: CharacterCreationData[] = [];
 
         CHARACTER_CREATION_DATA.forEach((innerMap, scope) => {
-            if(scope === CharacterCreationScope.FACE_FEATURE) {
-                innerMap.forEach((data, key) => {
-                    result.push(data);
-                });
+            if(scope === byScope) {
+                if(withNotSupportedForColours) {
+                    innerMap.forEach((data, key) => {
+                        result.push(data);
+                    });
+                } else {
+                    innerMap.forEach((data, key) => {
+                        if(!characterCreationDataNotSupportedForColours.find((notSupportedData) => notSupportedData.name === data.name)) {
+                            result.push(data);
+                        }
+                    });
+                }
             }
         });
         

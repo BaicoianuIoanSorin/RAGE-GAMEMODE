@@ -3,17 +3,18 @@ import { RoundedBoxWithColorComponent } from "../rounded-box-with-color/rounded-
 import "./box-with-colors.component.scss";
 import {
   CharacterCreationData,
-  CHARACTER_CREATION_WITH_COLORS,
   COLORS,
   CharacterCreationScope,
+  CHARACTER_CREATION_BY_SCOPE,
 } from "../../../../utils/character-creation/model";
 import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
 import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 
 export const BoxWithColorsComponent: React.FC = () => {
   const [selectedScope, setSelectedScope] = useState<CharacterCreationData>(); // State to hold the selected scope
-  const characterCreationData: CharacterCreationData[] =
-    CHARACTER_CREATION_WITH_COLORS();
+  const characterCreationData: CharacterCreationData[] = [
+    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, false),
+    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.EYE_COLOR, false)];
 
   let rpc: any = null;
   if ("rpc" in window && "callClient" in window.rpc) {
@@ -50,11 +51,11 @@ export const BoxWithColorsComponent: React.FC = () => {
 
   return (
     <div className="box-with-colors-container">
-      <div className="slider-title">Change color</div>
       <div className="scope-choosing-container">
-        {characterCreationData.map((data: CharacterCreationData) => (
+        {characterCreationData.map((data: CharacterCreationData, index: number) => (
           <div onClick={() => handleScopeChange(data)}>
             <BoxSelectedComponent
+            key={index}
               isSelected={isBoxComponentSelected(data)}
               data={data}
             />

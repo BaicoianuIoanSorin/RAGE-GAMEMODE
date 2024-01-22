@@ -1,8 +1,8 @@
 import "./character-creation.component.scss";
 import { BoxWithColorsComponent } from "./components.ts/box-with-colors/box-with-colors.component";
 import { CharacterFaceFeaturesComponent } from "./components.ts/character-face-features/character-face-features.component";
+import { CharacterHeadOverlayComponent } from "./components.ts/character-head-overlay/character-head-overlay.component";
 
-// TODO maybe make a constant with all CharacterCreationData
 export const CharacterCreationComponent: React.FC = () => {
 
   return (
@@ -11,7 +11,9 @@ export const CharacterCreationComponent: React.FC = () => {
         <BoxWithColorsComponent/>
         <CharacterFaceFeaturesComponent/>
       </div>
-      <div className="right-side">tHIS IS THE RIGHT SIDE</div>
+      <div className="right-side">
+        <CharacterHeadOverlayComponent/>
+      </div>
     </div>
   );
 };

@@ -1,12 +1,12 @@
-import { CHARACTER_CREATION_FACE_FEATURES, CharacterCreationData } from "../../../../utils/character-creation/model";
+import { CHARACTER_CREATION_BY_SCOPE, CharacterCreationData, CharacterCreationScope } from "../../../../utils/character-creation/model";
 import { CustomSlider } from "../slider/slider.component";
 import "./character-face-features.component.scss";
 
 export const CharacterFaceFeaturesComponent: React.FC = () => {
-    const characterCreationData: CharacterCreationData[] = CHARACTER_CREATION_FACE_FEATURES();
-    
+    const characterCreationData: CharacterCreationData[] = CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.FACE_FEATURE, true);
+
   return (
-    <div className="character-option-container">
+    <div className="character-face-features-container">
       {
           characterCreationData.map((data: CharacterCreationData) => {
             if(data.maxValue && data.minValue) {

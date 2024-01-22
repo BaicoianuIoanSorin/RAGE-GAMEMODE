@@ -156,10 +156,10 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
 	const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
-
+	
 	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
 
-	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 8) {
+	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 9) {
 		rpc.call(
 			CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
 			JSON.stringify({
@@ -167,7 +167,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 				withRemovingComponentVariations: true
 			} as CharacterCreationCameraFlagModel)
 		);
-	} else if (characterHeadOverlay.id >= 9 && characterHeadOverlay.id <= 12) {
+	} else if (characterHeadOverlay.id >= 10 && characterHeadOverlay.id <= 12) {
 		rpc.call(
 			CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
 			JSON.stringify({
