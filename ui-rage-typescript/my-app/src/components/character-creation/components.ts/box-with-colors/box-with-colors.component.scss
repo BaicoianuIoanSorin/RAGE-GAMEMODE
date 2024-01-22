@@ -1,0 +1,19 @@
+.colors-container {
+    display: flex;
+    flex-wrap: wrap; // Allow items to wrap onto the next line
+    align-items: center; // Vertically center
+    justify-content: flex-start; // Align items to the start of the container
+    gap: 5px; // Adjust as needed for space between items
+    padding: 10px; // Adjust as needed for padding inside the container
+}
+
+.box-with-colors-container {
+
+}
+
+@media (max-width: 600px) {
+    .colors-container {
+        gap: 5px;
+    }
+}
+

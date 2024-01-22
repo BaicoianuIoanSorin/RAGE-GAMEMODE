@@ -1,0 +1,47 @@
+.character-creation-container {
+    background-image: url("../../assets/wallpaper\ for\ testing\ character\ creation.png");
+    background-repeat: round;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: space-between;
+}
+
+.character-creation-side-style {
+    border: 1px solid black;
+    width: 24%;
+    height: 100%;
+    overflow: auto; /* 'overlay' is non-standard, 'auto' is more widely supported */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: rgba(134, 168, 89, 0.5);
+
+    /* Scrollbar styling */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #86a859 #e4e4e4; /* For Firefox: thumb and track color */
+
+    /* For Webkit (Chrome, Safari) */
+    &::-webkit-scrollbar {
+        width: 8px; /* Width of the scrollbar */
+    }
+    &::-webkit-scrollbar-track {
+        background: #e4e4e4; /* Color of the track */
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #86a859; /* Color of the thumb */
+        border-radius: 4px; /* Rounded corners on the thumb */
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: #769f5b; /* Color of the thumb on hover */
+    }
+}
+
+
+.left-side {
+    @extend .character-creation-side-style;
+}
+
+.right-side {
+    @extend .character-creation-side-style;
+}

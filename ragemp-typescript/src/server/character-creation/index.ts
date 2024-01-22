@@ -24,6 +24,10 @@ rpc.register(CreatorEvents.SERVER_CHECK_IF_CHARACTER_EXISTS, async (playerId: nu
 	return true;
 });
 
+rpc.register(CreatorEvents.SERVER_SEND_PLAYER_TO_DIMENSION, async (dimension: number, info) => {
+
+});
+
 // testing purposes
 rpc.register(CharacterCreationCommands.SET_HEAD_OVERLAY, async (argsJSON, info) => {
     console.log(`command:${CharacterCreationCommands.SET_HEAD_OVERLAY} -> ${argsJSON}`);

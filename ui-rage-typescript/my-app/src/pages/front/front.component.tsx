@@ -43,11 +43,12 @@ const Front = () => {
       setWindowsMap(windowsMapCopy);
   };
   
-  // TODO refactor this to handle only open window
-  window.rpc.on(WINDOW_EVENTS.CHANGE_STATE_WINDOW, (windowsJson) => {
-    const windows: WindowState[] = JSON.parse(windowsJson);
-    handleWindowChange(windows);
-  });
+  if(rpc) {
+    window.rpc.on(WINDOW_EVENTS.CHANGE_STATE_WINDOW, (windowsJson) => {
+      const windows: WindowState[] = JSON.parse(windowsJson);
+      handleWindowChange(windows);
+    });
+  }
 
   return (
     <div className="front-container">
