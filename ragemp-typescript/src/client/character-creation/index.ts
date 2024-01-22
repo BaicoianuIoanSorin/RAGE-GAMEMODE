@@ -58,6 +58,7 @@ let bodyCamera: CameraMp | undefined,
 rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
 	// TODO hire event in browser to close the HUD and chat and show the character creation UI
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
+	// TODO move character on a special location
 	if (!player.isPositionFrozen) player.freezePosition(true);
 	mp.gui.cursor.show(true, true);
 	mp.game.ui.displayRadar(false);
@@ -188,7 +189,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 	);
 });
 
-// TODO adding rest of the events for setting the character - look through the above documentation
+// TODO do hair styles and hair colors
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJson: string) => {
 	const headBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
