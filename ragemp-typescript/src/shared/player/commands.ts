@@ -15,10 +15,13 @@ export enum AdminChatCommands {
 }
 
 export enum CharacterCreationCommands {
-    SET_HEAD_OVERLAY = 'setHeadOverlay',
-
     // testing purposes
+    SET_HEAD_OVERLAY = 'setHeadOverlay',
+    SET_HEAD_BLEND_DATA = 'setHeadBlendData',
+    SET_FACE_FEATURE = 'setFaceFeature',
+    
     CHANGE_CAMERA_ANGLE = 'changeCameraAngle',
+    RESET_DEFAULT_CAMERA = 'resetDefaultCamera',
 }
 
 export const getAllCommandsValues = (): string[] => {

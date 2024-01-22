@@ -1,7 +1,7 @@
 import { AppDataSource } from '@/typeorm/typeorm';
 import { findPlayerByName } from '@/utils/players';
 import { CreatorEvents } from '@shared/character-creation/events.constants';
-import { CharacterComponentVariation, CharacterCreationCamera, CharacterHeadOverlay } from '@shared/character-creation/model';
+import { CharacterComponentVariation, CharacterCreationCamera, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay } from '@shared/character-creation/model';
 import { Character } from '@shared/entity/Character';
 import { User } from '@shared/entity/User';
 import { CharacterCreationCommands } from '@shared/player/commands';
@@ -24,6 +24,7 @@ rpc.register(CreatorEvents.SERVER_CHECK_IF_CHARACTER_EXISTS, async (playerId: nu
 	return true;
 });
 
+// testing purposes
 rpc.register(CharacterCreationCommands.SET_HEAD_OVERLAY, async (argsJSON, info) => {
     console.log(`command:${CharacterCreationCommands.SET_HEAD_OVERLAY} -> ${argsJSON}`);
     
@@ -45,6 +46,64 @@ rpc.register(CharacterCreationCommands.SET_HEAD_OVERLAY, async (argsJSON, info) 
     return await rpc.callClient(player, CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, JSON.stringify(characterHeadOverlay));
 });
 
+// testing purposes
+rpc.register(CharacterCreationCommands.SET_HEAD_BLEND_DATA, async (argsJSON, info) => {
+    console.log(`command:${CharacterCreationCommands.SET_HEAD_BLEND_DATA} -> ${argsJSON}`);
+
+    let args: Array<string> = JSON.parse(argsJSON);
+    let characterHeadBlendData: CharacterHeadBlendData = {
+        shapeFirstId: Number(args[0]),
+        shapeSecondId: Number(args[1]),
+        shapeThirdId: Number(args[2]),
+        skinFirstId: Number(args[3]),
+        skinSecondId: Number(args[4]),
+        skinThirdId: Number(args[5]),
+        shapeMix: Number(args[6]),
+        skinMix: Number(args[7]),
+        thirdMix: Number(args[8]),
+        isParent: Boolean(args[9]),
+    } as CharacterHeadBlendData;
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+    if (!player) {
+        console.error(`command:${CharacterCreationCommands.SET_HEAD_BLEND_DATA} -> ${args} -> player not found`);
+        return;
+    }
+
+    return await rpc.callClient(player, CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, JSON.stringify(characterHeadBlendData));
+});
+
+rpc.register(CharacterCreationCommands.RESET_DEFAULT_CAMERA, async (argsJSON, info) => {
+    console.log(`command:${CharacterCreationCommands.RESET_DEFAULT_CAMERA} -> ${argsJSON}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+    if (!player) {
+        console.error(`command:${CharacterCreationCommands.RESET_DEFAULT_CAMERA} -> ${argsJSON} -> player not found`);
+        return;
+    }
+
+    return await rpc.callClient(player, CreatorEvents.CLIENT_SHOW_CHARACTER_OVERALL);
+});
+
+rpc.register(CharacterCreationCommands.SET_FACE_FEATURE, async (argsJSON, info) => {
+    console.log(`command:${CharacterCreationCommands.SET_FACE_FEATURE} -> ${argsJSON}`);
+
+    let args: Array<string> = JSON.parse(argsJSON);
+    let characterFaceFeature: CharacterFaceFeature = {
+        id: Number(args[0]),
+        scale: Number(args[1]),
+    } as CharacterFaceFeature;
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+    if (!player) {
+        console.error(`command:${CharacterCreationCommands.SET_FACE_FEATURE} -> ${args} -> player not found`);
+        return;
+    }
+
+    return await rpc.callClient(player, CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, JSON.stringify(characterFaceFeature));
+});
+
+// testing purposes
 rpc.register(CharacterCreationCommands.CHANGE_CAMERA_ANGLE, async (argsJSON, info) => {
     console.log(`command:${CharacterCreationCommands.CHANGE_CAMERA_ANGLE} -> ${argsJSON}`);
 

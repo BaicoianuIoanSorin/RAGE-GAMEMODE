@@ -38,6 +38,8 @@ import {
 	CharacterCreationCamera,
 	CharacterCreationCameraFlag,
 	CharacterCreationCameraFlagModel,
+	CharacterFaceFeature,
+	CharacterHeadBlendData,
 	CharacterHeadOverlay
 } from '@shared/character-creation/model';
 import * as rpc from 'rage-rpc';
@@ -72,26 +74,8 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
 rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: boolean) => {
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_SET + ' ' + showCharacterCamera);
 	if (showCharacterCamera) {
-		bodyCameraStartPosition = player.position;
-		let characterCreationCamera: CharacterCreationCamera = { angle: player.getRotation(2).z + 90, distance: 2.6, height: 0.2 };
-		let pos = getCameraOffset(
-			new mp.Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
-			characterCreationCamera.angle,
-			characterCreationCamera.distance
-		);
-		bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
-		bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+		setCameraToDefaultPosition(true);
 
-		mp.console.logWarning(
-			'pointAtCoord: ' +
-				bodyCameraStartPosition.x +
-				' ' +
-				bodyCameraStartPosition.y +
-				' ' +
-				bodyCameraStartPosition.z +
-				characterCreationCamera.height
-		);
-		bodyCamera.setActive(true);
 		mp.game.cam.renderScriptCams(true, false, 500, true, false, 0);
 	} else {
 		if (bodyCamera == undefined) return;
@@ -201,12 +185,81 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 
 // TODO adding rest of the events for setting the character - look through the above documentation
 
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJson: string) => {
+	const headBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
+	rpc.call(
+		CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
+		JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel)
+	);
+
+	mp.players.local.setHeadBlendData(
+		headBlendData.shapeFirstId,
+		headBlendData.shapeSecondId,
+		headBlendData.shapeThirdId,
+		headBlendData.skinFirstId,
+		headBlendData.skinSecondId,
+		headBlendData.skinThirdId,
+		headBlendData.shapeMix,
+		headBlendData.skinMix,
+		headBlendData.thirdMix,
+		headBlendData.isParent
+	);
+});
+
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, (faceFeatureJson: string) => {
+	const faceFeature: CharacterFaceFeature = JSON.parse(faceFeatureJson);
+
+	rpc.call(
+		CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
+		JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel)
+	);
+
+	mp.players.local.setFaceFeature(faceFeature.id, faceFeature.scale);
+});
+
+rpc.register(CreatorEvents.CLIENT_SHOW_CHARACTER_OVERALL, () => {
+	setCameraToDefaultPosition(false);
+});
+
+
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
 	angle = angle * 0.0174533;
 	position.y = position.y + distance * Math.sin(angle);
 	position.x = position.x + distance * Math.cos(angle);
 	return position;
 };
+
+const setCameraToDefaultPosition = (justInitiated: boolean): void => {
+	bodyCameraStartPosition = player.position;
+		let characterCreationCamera: CharacterCreationCamera = { angle: player.getRotation(2).z + 90, distance: 2.6, height: 0.2 };
+		let pos = getCameraOffset(
+			new mp.Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
+			characterCreationCamera.angle,
+			characterCreationCamera.distance
+		);
+		bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
+		bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+
+		mp.console.logWarning(
+			'pointAtCoord: ' +
+				bodyCameraStartPosition.x +
+				' ' +
+				bodyCameraStartPosition.y +
+				' ' +
+				bodyCameraStartPosition.z +
+				characterCreationCamera.height
+		);
+
+		if(justInitiated) {
+			bodyCamera.setActive(true);
+		}
+}
 
 // for testing purposes
 rpc.register(CreatorEvents.CHANGE_CAMERA_ANGLE, (characterCreationCameraJson) => {

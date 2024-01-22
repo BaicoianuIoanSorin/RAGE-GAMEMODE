@@ -6,6 +6,10 @@ export enum CreatorEvents {
 
     // setting things to the player
     CLIENT_CREATOR_SET_HEAD_OVERLAY = 'client:CreatorSetHeadOverlay',
+    CLIENT_CREATOR_SET_HEAD_BLEND_DATA = 'client:CreatorSetHeadBlendData',
+    CLIENT_CREATOR_SET_FACE_FEATURE = 'client:CreatorSetFaceFeature',
+    CLIENT_SHOW_CHARACTER_OVERALL = 'client:ShowCharacterOverall',
+    
     SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 
     // testing purposes
