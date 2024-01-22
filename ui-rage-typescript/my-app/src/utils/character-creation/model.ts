@@ -166,6 +166,7 @@ export const COLORS: Map<number, string> = new Map([
          maxValue?: number;
          maxColor?: number;
          colorChoosen?: number;
+         valueChoosen?: number;
      }
  
      export const CHARACTER_CREATION_DATA: Map<CharacterCreationScope, Map<string, CharacterCreationData>> = new Map(

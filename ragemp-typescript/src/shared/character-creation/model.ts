@@ -166,6 +166,7 @@ export const COLORS: Map<number, string> = new Map([
          maxValue?: number;
          maxColor?: number;
          colorChoosen?: number;
+         valueChoosen?: number;
      }
  
      export const CHARACTER_CREATION_DATA: Map<CharacterCreationScope, Map<string, CharacterCreationData>> = new Map(
@@ -233,3 +234,17 @@ export const COLORS: Map<number, string> = new Map([
          
          return result;
      };
+
+     export const CHARACTER_CREATION_FACE_FEATURES = (): CharacterCreationData[] => {
+        const result: CharacterCreationData[] = [];
+
+        CHARACTER_CREATION_DATA.forEach((innerMap, scope) => {
+            if(scope === CharacterCreationScope.FACE_FEATURE) {
+                innerMap.forEach((data, key) => {
+                    result.push(data);
+                });
+            }
+        });
+        
+        return result;
+    };
