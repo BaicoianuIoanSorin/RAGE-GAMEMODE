@@ -38,6 +38,8 @@ import {
 	CharacterCreationCamera,
 	CharacterCreationCameraFlag,
 	CharacterCreationCameraFlagModel,
+	CharacterCreationData,
+	CharacterCreationScope,
 	CharacterFaceFeature,
 	CharacterHeadBlendData,
 	CharacterHeadOverlay
@@ -59,6 +61,9 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
 	if (!player.isPositionFrozen) player.freezePosition(true);
 	mp.gui.cursor.show(true, true);
 	mp.game.ui.displayRadar(false);
+
+	// 32 disables all control actions
+	player.updateControls(false, [32]);
 
 	for (let i = 0; i < 12; i++) {
 		let componentVariation: CharacterComponentVariation = await rpc.callServer(CreatorEvents.SERVER_GET_COMPONENT_VARIATION, i);
@@ -227,6 +232,40 @@ rpc.register(CreatorEvents.CLIENT_SHOW_CHARACTER_OVERALL, () => {
 	setCameraToDefaultPosition(false);
 });
 
+rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreationDataJson: string) => {
+	let characterCreationData: CharacterCreationData = JSON.parse(characterCreationDataJson);
+
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER + ' ' + characterCreationDataJson);
+
+	switch (characterCreationData.scope) {
+		case CharacterCreationScope.EYE_COLOR: {
+			rpc.callServer(CreatorEvents.SERVER_CREATOR_SET_EYE_COLOR, characterCreationData.colorChoosen);
+			break;
+		}
+		case CharacterCreationScope.HEAD_OVERLAY: {
+			let indexHeadOverlay = mp.players.local.getHeadOverlayValue(characterCreationData.id);
+			let characterHeadOverlay: CharacterHeadOverlay = {
+				id: characterCreationData.id,
+				index: indexHeadOverlay,
+				opacity: 1,
+				primaryColor: characterCreationData.colorChoosen,
+				// TODO make such that you can input both colors
+				secondaryColor: characterCreationData.colorChoosen
+			} as CharacterHeadOverlay;
+
+			rpc.call(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, JSON.stringify(characterHeadOverlay));
+			break;
+		}
+		case CharacterCreationScope.HEAD_BLEND_DATA: {
+			// TODO not implemented
+			return;
+		}
+		case CharacterCreationScope.FACE_FEATURE: {
+			// TODO not implemented
+			return;
+		}
+	}
+});
 
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
 	angle = angle * 0.0174533;
@@ -237,29 +276,29 @@ const getCameraOffset = (position: any, angle: number, distance: number): any | 
 
 const setCameraToDefaultPosition = (justInitiated: boolean): void => {
 	bodyCameraStartPosition = player.position;
-		let characterCreationCamera: CharacterCreationCamera = { angle: player.getRotation(2).z + 90, distance: 2.6, height: 0.2 };
-		let pos = getCameraOffset(
-			new mp.Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
-			characterCreationCamera.angle,
-			characterCreationCamera.distance
-		);
-		bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
-		bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
+	let characterCreationCamera: CharacterCreationCamera = { angle: player.getRotation(2).z + 90, distance: 2.6, height: 0.2 };
+	let pos = getCameraOffset(
+		new mp.Vector3(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height),
+		characterCreationCamera.angle,
+		characterCreationCamera.distance
+	);
+	bodyCamera = mp.cameras.new('default', pos, new mp.Vector3(0, 0, 0), 50);
+	bodyCamera.pointAtCoord(bodyCameraStartPosition.x, bodyCameraStartPosition.y, bodyCameraStartPosition.z + characterCreationCamera.height);
 
-		mp.console.logWarning(
-			'pointAtCoord: ' +
-				bodyCameraStartPosition.x +
-				' ' +
-				bodyCameraStartPosition.y +
-				' ' +
-				bodyCameraStartPosition.z +
-				characterCreationCamera.height
-		);
+	mp.console.logWarning(
+		'pointAtCoord: ' +
+			bodyCameraStartPosition.x +
+			' ' +
+			bodyCameraStartPosition.y +
+			' ' +
+			bodyCameraStartPosition.z +
+			characterCreationCamera.height
+	);
 
-		if(justInitiated) {
-			bodyCamera.setActive(true);
-		}
-}
+	if (justInitiated) {
+		bodyCamera.setActive(true);
+	}
+};
 
 // for testing purposes
 rpc.register(CreatorEvents.CHANGE_CAMERA_ANGLE, (characterCreationCameraJson) => {

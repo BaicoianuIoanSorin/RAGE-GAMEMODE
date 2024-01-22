@@ -1,75 +1,77 @@
 import React, { useState } from "react";
-import {
-  COLORS,
-  CharacterCreationData,
-  CHARACTER_CREATION_DATA,
-  CHARACTER_CREATION_WITH_COLORS,
-} from "../../constants";
 import { RoundedBoxWithColorComponent } from "../rounded-box-with-color/rounded-box-with-color.component";
 import "./box-with-colors.component.scss";
+import {
+  CharacterCreationData,
+  CHARACTER_CREATION_WITH_COLORS,
+  COLORS,
+  CharacterCreationScope,
+} from "../../../../utils/character-creation/model";
+import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
+import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 
 export const BoxWithColorsComponent: React.FC = () => {
   const [selectedScope, setSelectedScope] = useState<CharacterCreationData>(); // State to hold the selected scope
-
-  
-  const onClickOnColor = (idColor: number) => {
-    // Call client in rage for changings using props.data using the idColor
-    console.log(`Color ID: ${idColor}, Scope: ${selectedScope}`);
-    // ... additional logic
-  };
-
   const characterCreationData: CharacterCreationData[] =
     CHARACTER_CREATION_WITH_COLORS();
 
-  const handleScopeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    if(event.target.value === "") {
-        setSelectedScope(undefined);
-        return;
+  let rpc: any = null;
+  if ("rpc" in window && "callClient" in window.rpc) {
+    rpc = window.rpc;
+  }
+
+  const onClickOnColor = (idColor: number) => {
+    if (rpc) {
+      rpc.callClient(
+        CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER,
+        JSON.stringify({
+          ...selectedScope,
+          colorChoosen: idColor,
+        } as CharacterCreationData)
+      );
     }
-    const selectedData: CharacterCreationData = JSON.parse(event.target.value);
-    setSelectedScope(selectedData);
+  };
+
+  const isBoxComponentSelected = (data: CharacterCreationData): boolean => {
+    return (
+      selectedScope?.id === data.id &&
+      selectedScope?.scope === data.scope &&
+      selectedScope?.name === data.name
+    );
+  };
+
+  const handleScopeChange = (data: CharacterCreationData) => {
+    if(isBoxComponentSelected(data)) {
+      setSelectedScope(undefined);
+      return;
+    }
+    setSelectedScope(data);
   };
 
   return (
     <div className="box-with-colors-container">
       <div className="slider-title">Change color</div>
       <div className="scope-choosing-container">
-        <select
-          value={JSON.stringify(selectedScope)}
-          onChange={handleScopeChange}
-        >
-          <option value="">Select a Scope</option>
-          {characterCreationData.map(
-            (data: CharacterCreationData, index: number) => (
-              <option key={index} value={JSON.stringify(data)}>
-                {data.name}
-              </option>
-            )
-          )}
-        </select>
+        {characterCreationData.map((data: CharacterCreationData) => (
+          <div onClick={() => handleScopeChange(data)}>
+            <BoxSelectedComponent
+              isSelected={isBoxComponentSelected(data)}
+              data={data}
+            />
+          </div>
+        ))}
       </div>
-      {(selectedScope != null) && (
+      {/* // for eyes there are different colours, maybe have a look on the specific list of colours and names for eyes */}
+      {(selectedScope && selectedScope.scope !== CharacterCreationScope.EYE_COLOR) && (
         <div className="colors-container">
-          {Array.from(COLORS).map(([key, value]) => {
-            if (selectedScope.maxColor && key <= selectedScope.maxColor) {
-                return (
-                    <RoundedBoxWithColorComponent
-                      key={key}
-                      color={value}
-                      onClick={() => onClickOnColor(key)}
-                    />
-                    );        
-            }
-            else if(selectedScope.maxColor == undefined) {
-                return (
-                    <RoundedBoxWithColorComponent
-                      key={key}
-                      color={value}
-                      onClick={() => onClickOnColor(key)}
-                    />
-                    );
-            }
-          })}
+          {Array.from(COLORS).map(
+            ([key, value]) =>
+              (!selectedScope.maxColor || key <= selectedScope.maxColor) && (
+                <div onClick={() => onClickOnColor(key)}>
+                  <RoundedBoxWithColorComponent key={key} color={value} />
+                </div>
+              )
+          )}
         </div>
       )}
     </div>

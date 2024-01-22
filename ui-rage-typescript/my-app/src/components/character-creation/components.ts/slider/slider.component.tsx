@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './slider.component.scss'; // Import your styles here
-import { CharacterCreationData } from '../../constants';
+import { CharacterCreationData } from '../../../../utils/character-creation/model';
 
 interface SliderProps {
     title: string;

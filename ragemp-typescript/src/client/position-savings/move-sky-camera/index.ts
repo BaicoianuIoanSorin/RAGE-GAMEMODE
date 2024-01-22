@@ -42,7 +42,7 @@ async function moveFromToAir(player: PlayerMp, moveTo: string, switchType: strin
                         // TODO delete this when the development of the character creation is finished
                         {
                             windowName: Window.HUD,
-                            state: true
+                            state: false
                         }
                     ] as WindowState[]));
 				}

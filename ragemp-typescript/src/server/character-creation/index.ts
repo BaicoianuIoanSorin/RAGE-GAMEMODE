@@ -24,6 +24,15 @@ rpc.register(CreatorEvents.SERVER_CHECK_IF_CHARACTER_EXISTS, async (playerId: nu
 	return true;
 });
 
+rpc.register(CreatorEvents.SERVER_CREATOR_SET_EYE_COLOR, (eyeColor: number, info) => {
+    console.log(`${CreatorEvents.SERVER_CREATOR_SET_EYE_COLOR} -> eyeColor:${eyeColor}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(player) {
+        player.eyeColor = eyeColor;
+    }
+});
 rpc.register(CreatorEvents.SERVER_SEND_PLAYER_TO_DIMENSION, async (dimension: number, info) => {
 
 });

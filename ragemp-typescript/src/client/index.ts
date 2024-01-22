@@ -18,17 +18,16 @@ let browser: BrowserMp;
 let player = mp.players.local;
 
 function createBrowser() {
-    if (browser) return;
+	if (browser) return;
 
-    browser = mp.browsers.new("http://localhost:3000");
-
+	browser = mp.browsers.new('http://localhost:3000');
 }
 
 function onBrowserReady(browser: BrowserMp) {
-    if (browser.url !== browser.url) return;
-    
-    browser.markAsChat();
-    mp.console.logInfo("Browser app loaded and marked as chat!");
+	if (browser.url !== browser.url) return;
+
+	browser.markAsChat();
+	mp.console.logInfo('Browser app loaded and marked as chat!');
 
 	player.freezePosition(true);
 	mp.game.ui.setMinimapVisible(false);
@@ -37,24 +36,40 @@ function onBrowserReady(browser: BrowserMp) {
 		mp.gui.cursor.visible = true;
 	}, 0);
 	mp.events.callRemote(AUTH.JOIN);
-	rpc.triggerBrowser(browser, WINDOW_EVENTS.CHANGE_STATE_WINDOW, JSON.stringify([
-		{
-			windowName: Window.LOGIN,
-			state: true
-		},
-	] as WindowState[]));
+	rpc.triggerBrowser(
+		browser,
+		WINDOW_EVENTS.CHANGE_STATE_WINDOW,
+		JSON.stringify([
+			{
+				windowName: Window.LOGIN,
+				state: true
+			}
+		] as WindowState[])
+	);
 	mp.console.logInfo(PLAYER_CONSTANTS.PLAYERS_READY);
 }
 
 mp.events.add(PLAYER_CONSTANTS.PLAYERS_READY, () => {
-    mp.console.logInfo(`Client: ${player.name} is ready!`);
-    
-    // disable default chat
-    mp.gui.chat.show(false);
-    mp.gui.chat.activate(false);
+	mp.console.logInfo(`Client: ${player.name} is ready!`);
 
-    // create our own browser and mark as chat
-    createBrowser();
+	// disable default chat
+	mp.gui.chat.show(false);
+	mp.gui.chat.activate(false);
+
+	mp.players.local.updateControls = (enable: boolean, controls: number[]) => {
+		controls.forEach((control: number) => {
+			if(enable) {
+				mp.game.controls.enableControlAction(0, control, true);
+			}
+			else {
+				mp.game.controls.disableControlAction(0, control, true);
+			}
+			
+		});
+	}
+
+	// create our own browser and mark as chat
+	createBrowser();
 });
 
 mp.events.add('browserDomReady', onBrowserReady);
@@ -65,12 +80,16 @@ rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
 	mp.gui.cursor.show(false, false);
 	setTimeout(() => {
 		mp.events.callRemote(AUTH.SERVER_LOGIN_SUCCES);
-		rpc.triggerBrowser(browser, WINDOW_EVENTS.CHANGE_STATE_WINDOW, JSON.stringify([
-			{
-				windowName: Window.LOGIN,
-				state: false
-			},
-		] as WindowState[]));
+		rpc.triggerBrowser(
+			browser,
+			WINDOW_EVENTS.CHANGE_STATE_WINDOW,
+			JSON.stringify([
+				{
+					windowName: Window.LOGIN,
+					state: false
+				}
+			] as WindowState[])
+		);
 	}, 3000);
 	mp.console.logInfo(AUTH.CLIENT_LOGIN_SUCCES);
 });
@@ -78,22 +97,13 @@ rpc.on(AUTH.CLIENT_LOGIN_SUCCES, () => {
 let isIntervalSet = false;
 
 mp.events.add('render', async () => {
-    if (player.getVariable(PlayersVariables.isLoggedIn) && !isIntervalSet) {
-		
+	if (player.getVariable(PlayersVariables.isLoggedIn) && !isIntervalSet) {
 		// updating and retrieving information about hungry and thirsty level
 		const runTimerForGettinAndUpdatingHungryThirsty = 1 * 60 * 1000; // 3 minutes
 		isIntervalSet = true;
-        setInterval(async () => {
-            const newThirstyHungryLevel = await rpc.callServer(ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL, mp.players.local.id);
-            await rpc.callBrowsers(ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL, JSON.stringify(newThirstyHungryLevel));
-        }, runTimerForGettinAndUpdatingHungryThirsty);
-
-		// for chat messages
-		if (mp.players.local.isTypingInTextChat) {
-			mp.game.controls.disableAllControlActions(0);
-			mp.game.controls.disableAllControlActions(1);
-			mp.game.controls.disableAllControlActions(2);
-		}
-    }
+		setInterval(async () => {
+			const newThirstyHungryLevel = await rpc.callServer(ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL, mp.players.local.id);
+			await rpc.callBrowsers(ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL, JSON.stringify(newThirstyHungryLevel));
+		}, runTimerForGettinAndUpdatingHungryThirsty);
+	}
 });
-
