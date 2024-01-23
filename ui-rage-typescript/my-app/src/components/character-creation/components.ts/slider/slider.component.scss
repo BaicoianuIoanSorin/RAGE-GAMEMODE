@@ -3,10 +3,24 @@
     flex-direction: column;
     align-items: center;
     margin: 10px;
+    background-color: #f8f8f8; // Light background for the slider container
+    padding: 20px;
+    border-radius: 8px; // Rounded corners for the container
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Subtle shadow for depth
+}
+
+.title-reset-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 10px;
 }
 
 .slider-title {
-    margin-bottom: 5px;
+    font-size: 1.2em; // Larger text for the title
+    font-weight: bold; // Bold font for the title
+    color: #333; // Dark color for text
 }
 
 .slider {
@@ -16,4 +30,16 @@
 
 .slider-value {
     margin-top: 5px;
+}
+
+.slider-reset-button {
+    padding: 5px 10px;
+    background-color: #e74c3c; // Red color for the reset button
+    color: white; // White text for the reset button
+    border: none;
+    border-radius: 4px; // Rounded corners for the button
+    cursor: pointer; // Cursor change to indicate it's clickable
+    &:hover {
+        background-color: #c0392b; // Darker red on hover
+    }
 }

@@ -1,67 +1,67 @@
 .box-selected-container {
     display: flex;
+    flex-direction: column; /* Stack items vertically */
     align-items: center;
-    justify-content: center; /* Center content horizontally */
-    border: 1px solid #86a859; /* Border color */
-    padding: 10px; /* Increased padding for better spacing */
-    margin: 0 4px; /* Reduced side margins for better fit in container */
-    flex: 0 1 auto; /* Allow boxes to shrink and grow as needed */
-    min-width: 100px; /* Minimum width to ensure content fits */
-    height: auto; /* Height to auto to maintain aspect ratio */
-    border-radius: 8px;
+    justify-content: space-between; /* Distribute space evenly */
+    border: 2px solid #86a859; /* Slightly thicker border for better visibility */
+    padding: 10px; /* Padding around content */
+    margin: 10px; /* Margin to separate items */
+    width: 120px; /* Fixed width for all boxes */
+    height: 160px; /* Fixed height for all boxes */
+    border-radius: 10px; /* Rounded corners */
     background-color: #f9f9f9; /* Light background */
     transition: all 0.3s ease; /* Smooth transition for hover effect */
-    overflow: hidden; /* Ensure content does not overflow */
-    text-align: center; /* Center text */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
     cursor: pointer;
+    position: relative; /* For absolute positioning of children if needed */
+    overflow: hidden; /* Hide overflow */
 }
 
 .box-selected-container.selected {
     background-color: #86a859; /* Highlight background for selected */
     color: #ffffff; /* Text color for selected */
     border-color: #5a7d4b; /* Border color for selected */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: shadow for selected */
 }
 
 .box-selected-image {
-    width: 30px; /* Adjusted width */
-    height: 30px; /* Adjusted height for square appearance */
-    margin-bottom: 5px; /* Space between image and text */
+    width: 100%; /* Image takes full width of the container */
+    height: auto; /* Height is auto to maintain aspect ratio */
+    flex-grow: 0; /* Prevent image from growing */
+    flex-shrink: 0; /* Prevent image from shrinking */
+    object-fit: cover; /* Cover the area without distorting aspect ratio */
 }
 
 .box-selected-value {
-    font-size: 0.9rem; /* Adjusted font size */
+    font-size: 1rem; /* Readable font size */
     font-weight: bold;
-    overflow: hidden; /* Hide overflow */
-    text-overflow: ellipsis; /* Add ellipsis to overflow text */
-    white-space: nowrap; /* Keep text in single line */
+    color: inherit; /* Text color inherited from container */
+    margin-top: 5px; /* Space between image and text */
+    text-align: center; /* Center text horizontally */
 }
 
-/* Responsiveness */
+/* Hover effect for non-selected boxes */
+.box-selected-container:not(.selected):hover {
+    border-color: #a0b97f; /* Lighten border on hover */
+    background-color: #f0f0f0; /* Lighten background on hover */
+}
+
+/* Adjustments for smaller screens */
 @media (max-width: 768px) {
     .box-selected-container {
-        width: 80px; /* Adjust width for tablet */
-        padding: 8px; /* Adjust padding for tablet */
-    }
-    .box-selected-image {
-        width: 25px; /* Adjust image size for tablet */
-        height: 25px;
+        width: 100px; /* Slightly smaller width for tablet */
+        height: 140px; /* Slightly smaller height for tablet */
     }
     .box-selected-value {
-        font-size: 0.8rem; /* Adjust font size for tablet */
+        font-size: 0.9rem; /* Smaller font size for tablet */
     }
 }
 
 @media (max-width: 600px) {
     .box-selected-container {
-        width: 60px; /* Smaller width for mobile */
-        padding: 6px; /* Reduced padding for mobile */
-    }
-    .box-selected-image {
-        width: 20px; /* Smaller image for mobile */
-        height: 20px;
+        width: 80px; /* Smaller width for mobile */
+        height: 120px; /* Smaller height for mobile */
     }
     .box-selected-value {
-        font-size: 0.7rem; /* Smaller font size for mobile */
+        font-size: 0.8rem; /* Smaller font size for mobile */
     }
 }

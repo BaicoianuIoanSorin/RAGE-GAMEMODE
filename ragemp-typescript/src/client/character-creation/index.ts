@@ -178,8 +178,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 		);
 	}
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
-
-	// until id 9 you can use CharacterCreationCameraFlag.HEAD, from 9 to 11 I need to set the position of the camera on the body and take the clothes off
+	
 	player.setHeadOverlay(
 		characterHeadOverlay.id,
 		characterHeadOverlay.index,

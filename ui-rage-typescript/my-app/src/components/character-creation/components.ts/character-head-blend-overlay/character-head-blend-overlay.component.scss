@@ -1,3 +1,32 @@
 .character-head-blend-overlay-container {
-    
+    display: flex;
+    flex-direction: column;
+}
+
+.choosing-character-parent {
+    display: flex;
+    overflow-x: auto; // Enable horizontal scrolling
+    gap: 10px; // Adjust as needed for space between items
+    padding: 10px; // Padding inside the container
+    align-items: center; // Vertically center items in the container
+    white-space: nowrap; // Prevent wrapping of content to a new line
+
+    /* Scrollbar styling */
+    scrollbar-width: thin; /* For Firefox */
+    scrollbar-color: #86a859 #e4e4e4; /* For Firefox: thumb and track color */
+
+    /* For Webkit (Chrome, Safari) */
+    &::-webkit-scrollbar {
+        width: 8px; /* Width of the scrollbar */
+    }
+    &::-webkit-scrollbar-track {
+        background: #e4e4e4; /* Color of the track */
+    }
+    &::-webkit-scrollbar-thumb {
+        background: #86a859; /* Color of the thumb */
+        border-radius: 4px; /* Rounded corners on the thumb */
+    }
+    &::-webkit-scrollbar-thumb:hover {
+        background: #769f5b; /* Color of the thumb on hover */
+    }
 }
