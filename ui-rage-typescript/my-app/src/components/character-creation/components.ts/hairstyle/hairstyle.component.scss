@@ -60,3 +60,12 @@
         background: #769f5b; /* Color of the thumb on hover */
     }
 }
+
+.hairstyle-changing-colors {
+    display: flex;
+    flex-wrap: wrap; // Allow items to wrap onto the next line
+    align-items: center; // Vertically center
+    justify-content: flex-start; // Align items to the start of the container
+    gap: 5px; // Adjust as needed for space between items
+    padding: 10px; // Adjust as needed for padding inside the container
+}

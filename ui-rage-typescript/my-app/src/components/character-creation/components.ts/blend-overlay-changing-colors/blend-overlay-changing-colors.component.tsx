@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { RoundedBoxWithColorComponent } from "../rounded-box-with-color/rounded-box-with-color.component";
-import "./box-with-colors.component.scss";
+import "./blend-overlay-changing-colors.component.scss";
 import {
   CharacterCreationData,
   COLORS,
@@ -10,7 +10,7 @@ import {
 import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
 import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 
-export const BoxWithColorsComponent: React.FC = () => {
+export const BlendOverlayChangingColorsComponent: React.FC = () => {
   const [selectedScope, setSelectedScope] = useState<CharacterCreationData>(); // State to hold the selected scope
   const characterCreationData: CharacterCreationData[] = [
     ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, false),

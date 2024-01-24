@@ -154,6 +154,7 @@ export const COLORS: Map<number, string> = new Map([
          FACE_FEATURE = "faceFeature",
          HEAD_BLEND_DATA = "headBlendData",
          EYE_COLOR = "eyeColor",
+         HAIR_COLOR = "hairColor",
      }
  
      

@@ -93,7 +93,8 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: bool
 	}
 	player.taskPlayAnim('amb@world_human_guard_patrol@male@base', 'base', 8.0, 1, -1, 1, 0.0, false, false, false);
 });
-rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagModelJson: string) => {
+
+function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT + ' ' + characterCreationCameraFlagModelJson);
 
 	const characterCreationCameraFlagModel: CharacterCreationCameraFlagModel = JSON.parse(characterCreationCameraFlagModelJson);
@@ -153,7 +154,8 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 			bodyCameraStartPosition.z +
 			characterCreationCamera.height
 	);
-});
+}
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagModelJson: string) => creatorCameraEdit(characterCreationCameraFlagModelJson));
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
 	const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
@@ -161,22 +163,21 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
 
 	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 9) {
-		rpc.call(
-			CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
-			JSON.stringify({
-				characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-				withRemovingComponentVariations: true
-			} as CharacterCreationCameraFlagModel)
-		);
+
+		// TODO because it is in the same file, move the event functionality in a method
+		creatorCameraEdit(JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel))
+		
 	} else if (characterHeadOverlay.id >= 10 && characterHeadOverlay.id <= 12) {
-		rpc.call(
-			CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
-			JSON.stringify({
-				characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
-				withRemovingComponentVariations: true
-			} as CharacterCreationCameraFlagModel)
-		);
+		creatorCameraEdit(JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel))
+		
 	}
+	
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
 	
 	player.setHeadOverlay(
@@ -192,13 +193,11 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJson: string) => {
 	const headBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
-	rpc.call(
-		CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
-		JSON.stringify({
-			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-			withRemovingComponentVariations: true
-		} as CharacterCreationCameraFlagModel)
-	);
+	creatorCameraEdit(JSON.stringify({
+		characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+		withRemovingComponentVariations: true
+	} as CharacterCreationCameraFlagModel))
+	
 
 	mp.players.local.setHeadBlendData(
 		headBlendData.shapeFirstId,
@@ -217,13 +216,11 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJso
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, (faceFeatureJson: string) => {
 	const faceFeature: CharacterFaceFeature = JSON.parse(faceFeatureJson);
 
-	rpc.call(
-		CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT,
-		JSON.stringify({
-			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-			withRemovingComponentVariations: true
-		} as CharacterCreationCameraFlagModel)
-	);
+	creatorCameraEdit(JSON.stringify({
+		characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+		withRemovingComponentVariations: true
+	} as CharacterCreationCameraFlagModel))
+	
 
 	mp.players.local.setFaceFeature(faceFeature.id, faceFeature.scale);
 });
@@ -256,8 +253,8 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreat
 			rpc.call(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, JSON.stringify(characterHeadOverlay));
 			break;
 		}
-		case CharacterCreationScope.HEAD_BLEND_DATA: {
-			// TODO not implemented
+		case CharacterCreationScope.HAIR_COLOR: {
+			if(characterCreationData.colorChoosen) mp.players.local.setHairColor(characterCreationData.colorChoosen, characterCreationData.colorChoosen);
 			return;
 		}
 	}
@@ -266,9 +263,19 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreat
 rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, (characterComponentVariationJson: string) => {
 	let characterComponentVariation: CharacterComponentVariation = JSON.parse(characterComponentVariationJson);
 
+	// TODO see what others components ids can have this head camera
+	if(characterComponentVariation.componentId === 2) {
+		creatorCameraEdit(JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel))
+		
+	}
 	mp.console.logInfo(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION + ' ' + characterComponentVariationJson);
 
 	mp.players.local.setComponentVariation(characterComponentVariation.componentId, characterComponentVariation.drawableId, characterComponentVariation.textureId, characterComponentVariation.paletteId);
+
+	// TODO save variable for component variation to the player
 });
 
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
