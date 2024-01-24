@@ -13,8 +13,7 @@ import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 export const BlendOverlayChangingColorsComponent: React.FC = () => {
   const [selectedScope, setSelectedScope] = useState<CharacterCreationData>(); // State to hold the selected scope
   const characterCreationData: CharacterCreationData[] = [
-    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, false),
-    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.EYE_COLOR, false)];
+    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, false)];
 
   let rpc: any = null;
   if ("rpc" in window && "callClient" in window.rpc) {
@@ -63,7 +62,7 @@ export const BlendOverlayChangingColorsComponent: React.FC = () => {
         ))}
       </div>
       {/* // for eyes there are different colours, maybe have a look on the specific list of colours and names for eyes */}
-      {(selectedScope && selectedScope.scope !== CharacterCreationScope.EYE_COLOR) && (
+      {selectedScope && (
         <div className="colors-container">
           {Array.from(COLORS).map(
             ([key, value]) =>

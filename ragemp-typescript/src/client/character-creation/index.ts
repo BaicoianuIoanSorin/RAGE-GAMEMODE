@@ -67,7 +67,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
 	// 32 disables all control actions
 	player.updateControls(false, [32]);
 
-	applyCreatorOutfit(player.getVariable(PlayersVariables.Gender));
+	applyCreatorOutfit();
 
 	for (let i = 0; i < 12; i++) {
 		let componentVariation: CharacterComponentVariation = await rpc.callServer(CreatorEvents.SERVER_GET_COMPONENT_VARIATION, i);
@@ -298,25 +298,19 @@ rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, (characterComponentVa
 );
 
 // TODO probably needed
-function applyCreatorOutfit(gender: number) {
-	if (gender == 0) {
-		mp.players.local.setDefaultComponentVariation();
-		mp.players.local.setComponentVariation(3, 15, 0, 2);
-		mp.players.local.setComponentVariation(4, 21, 0, 2);
-		mp.players.local.setComponentVariation(6, 34, 0, 2);
-		mp.players.local.setComponentVariation(8, 15, 0, 2);
-		mp.players.local.setComponentVariation(11, 15, 0, 2);
-	} else {
-		mp.players.local.setDefaultComponentVariation();
-		mp.players.local.setComponentVariation(3, 15, 0, 2);
-		mp.players.local.setComponentVariation(4, 10, 0, 2);
-		mp.players.local.setComponentVariation(6, 35, 0, 2);
-		mp.players.local.setComponentVariation(8, 15, 0, 2);
-		mp.players.local.setComponentVariation(11, 15, 0, 2);
-	}
+function applyCreatorOutfit() {
+	mp.players.local.setDefaultComponentVariation();
+		mp.players.local.setComponentVariation(3, 15, 0, 0);
+		mp.players.local.setComponentVariation(4, 15, 0, 0);
+		mp.players.local.setComponentVariation(6, 15, 0, 0);
+		mp.players.local.setComponentVariation(8, 15, 0, 0);
+		mp.players.local.setComponentVariation(11, 15, 0, 0);
+		mp.console.logInfo('applyCreatorOutfit');
 }
 
 rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, (gender: number) => {
+	// TODO when setting the outfit again, it does remove the items for some reason
+	applyCreatorOutfit();
 	// TODO some bug here when changin the gender the face does not change
 	// switch (gender) {
 	// 	case 0: {
@@ -355,7 +349,6 @@ rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, (gender: number) => {
 	// 	}
 	// }
 	rpc.callServer(CreatorEvents.SERVER_CHANGE_GENDER, gender);
-	applyCreatorOutfit(gender);
 });
 
 rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
