@@ -12,7 +12,10 @@ export enum CreatorEvents {
     CLIENT_CREATOR_SET_FACE_FEATURE = 'client:CreatorSetFaceFeature',
     CLIENT_SHOW_CHARACTER_OVERALL = 'client:ShowCharacterOverall',
 	CLIENT_SET_COMPONENT_VARIATION = 'client:setComponentVariation',
+    CLIENT_CHANGE_HAIR_COLOUR = 'client:changeHairColour',
 	SERVER_CREATOR_SET_EYE_COLOR = 'server:CreatorSetEyeColor',
+    CLIENT_CHANGE_GENDER = 'client:changeGender',
+    CLIENT_GET_GENDER = 'client:getGender',
     SERVER_CHANGE_GENDER = 'server:changeGender',
     SERVER_GET_GENDER = 'server:getGender',
     

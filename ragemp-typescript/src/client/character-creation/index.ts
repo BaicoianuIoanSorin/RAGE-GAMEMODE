@@ -44,6 +44,7 @@ import {
 	CharacterHeadBlendData,
 	CharacterHeadOverlay
 } from '@shared/character-creation/model';
+import { PlayersVariables } from '@shared/player/PlayerVariables';
 import * as rpc from 'rage-rpc';
 
 const player: PlayerMp = mp.players.local;
@@ -65,6 +66,8 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
 
 	// 32 disables all control actions
 	player.updateControls(false, [32]);
+
+	applyCreatorOutfit(player.getVariable(PlayersVariables.Gender));
 
 	for (let i = 0; i < 12; i++) {
 		let componentVariation: CharacterComponentVariation = await rpc.callServer(CreatorEvents.SERVER_GET_COMPONENT_VARIATION, i);
@@ -94,7 +97,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, (showCharacterCamera: bool
 	player.taskPlayAnim('amb@world_human_guard_patrol@male@base', 'base', 8.0, 1, -1, 1, 0.0, false, false, false);
 });
 
-function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
+async function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT + ' ' + characterCreationCameraFlagModelJson);
 
 	const characterCreationCameraFlagModel: CharacterCreationCameraFlagModel = JSON.parse(characterCreationCameraFlagModelJson);
@@ -103,33 +106,14 @@ function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
 	switch (characterCreationCameraFlagModel.characterCreationCameraFlag) {
 		case CharacterCreationCameraFlag.HEAD: {
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.6 };
-
-			if (characterCreationCameraFlagModel.withRemovingComponentVariations) {
-				player.setDefaultComponentVariation();
-			}
-
 			break;
 		}
 		case CharacterCreationCameraFlag.BODY: {
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.2 };
-
-			if (characterCreationCameraFlagModel.withRemovingComponentVariations) {
-				player.setDefaultComponentVariation();
-
-				player.setComponentVariation(11, 15, 0, 0);
-				player.setComponentVariation(3, 15, 0, 0);
-				player.setComponentVariation(8, 15, 0, 0);
-			}
-
 			break;
 		}
 		case CharacterCreationCameraFlag.LEGS: {
 			characterCreationCamera = { angle: 90, distance: 1, height: -0.5 };
-
-			if (characterCreationCameraFlagModel.withRemovingComponentVariations) {
-				player.setDefaultComponentVariation();
-				player.setComponentVariation(4, 15, 0, 0);
-			}
 			break;
 		}
 	}
@@ -155,31 +139,17 @@ function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
 			characterCreationCamera.height
 	);
 }
-rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagModelJson: string) => creatorCameraEdit(characterCreationCameraFlagModelJson));
+rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraFlagModelJson: string) =>
+	creatorCameraEdit(characterCreationCameraFlagModelJson)
+);
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
 	const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
-	
+
 	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
 
-	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 9) {
-
-		// TODO because it is in the same file, move the event functionality in a method
-		creatorCameraEdit(JSON.stringify({
-			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-			withRemovingComponentVariations: true
-		} as CharacterCreationCameraFlagModel))
-		
-	} else if (characterHeadOverlay.id >= 10 && characterHeadOverlay.id <= 12) {
-		creatorCameraEdit(JSON.stringify({
-			characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
-			withRemovingComponentVariations: true
-		} as CharacterCreationCameraFlagModel))
-		
-	}
-	
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
-	
+
 	player.setHeadOverlay(
 		characterHeadOverlay.id,
 		characterHeadOverlay.index,
@@ -187,17 +157,31 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 		characterHeadOverlay.primaryColor,
 		characterHeadOverlay.secondaryColor
 	);
+
+	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 9) {
+		// TODO because it is in the same file, move the event functionality in a method
+		creatorCameraEdit(
+			JSON.stringify({
+				characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+				withRemovingComponentVariations: true
+			} as CharacterCreationCameraFlagModel)
+		);
+	} else if (characterHeadOverlay.id >= 10 && characterHeadOverlay.id <= 12) {
+		creatorCameraEdit(
+			JSON.stringify({
+				characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
+				withRemovingComponentVariations: true
+			} as CharacterCreationCameraFlagModel)
+		);
+	}
 });
 
 // TODO do hair styles and hair colors
 
-rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJson: string) => {
+function setHeadBlendData(headBlendDataJson: string) {
 	const headBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
-	creatorCameraEdit(JSON.stringify({
-		characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-		withRemovingComponentVariations: true
-	} as CharacterCreationCameraFlagModel))
-	
+	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA + ' ' + headBlendDataJson);
+	console.log(headBlendDataJson);
 
 	mp.players.local.setHeadBlendData(
 		headBlendData.shapeFirstId,
@@ -211,25 +195,36 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJso
 		headBlendData.thirdMix,
 		headBlendData.isParent
 	);
-});
+
+	creatorCameraEdit(
+		JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel)
+	);
+	// TODO save head blend data to the player variables
+}
+
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJson: string) => setHeadBlendData(headBlendDataJson));
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, (faceFeatureJson: string) => {
 	const faceFeature: CharacterFaceFeature = JSON.parse(faceFeatureJson);
 
-	creatorCameraEdit(JSON.stringify({
-		characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-		withRemovingComponentVariations: true
-	} as CharacterCreationCameraFlagModel))
-	
-
 	mp.players.local.setFaceFeature(faceFeature.id, faceFeature.scale);
+
+	creatorCameraEdit(
+		JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel)
+	);
 });
 
 rpc.register(CreatorEvents.CLIENT_SHOW_CHARACTER_OVERALL, () => {
 	setCameraToDefaultPosition(false);
 });
 
-rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreationDataJson: string) => {
+rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, async (characterCreationDataJson: string) => {
 	let characterCreationData: CharacterCreationData = JSON.parse(characterCreationDataJson);
 
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER + ' ' + characterCreationDataJson);
@@ -246,7 +241,6 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreat
 				index: indexHeadOverlay,
 				opacity: 1,
 				primaryColor: characterCreationData.colorChoosen,
-				// TODO make such that you can input both colors
 				secondaryColor: characterCreationData.colorChoosen
 			} as CharacterHeadOverlay;
 
@@ -254,28 +248,118 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreat
 			break;
 		}
 		case CharacterCreationScope.HAIR_COLOR: {
-			if(characterCreationData.colorChoosen) mp.players.local.setHairColor(characterCreationData.colorChoosen, characterCreationData.colorChoosen);
+			if (characterCreationData.colorChoosen) {
+				mp.players.local.setHairColor(characterCreationData.colorChoosen, characterCreationData.colorChoosen);
+			}
 			return;
 		}
 	}
+
+	creatorCameraEdit(
+		JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: false
+		} as CharacterCreationCameraFlagModel)
+	);
 });
 
-rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, (characterComponentVariationJson: string) => {
+function setCharacterComponentVariation(characterComponentVariationJson: string) {
 	let characterComponentVariation: CharacterComponentVariation = JSON.parse(characterComponentVariationJson);
 
 	// TODO see what others components ids can have this head camera
-	if(characterComponentVariation.componentId === 2) {
-		creatorCameraEdit(JSON.stringify({
-			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-			withRemovingComponentVariations: true
-		} as CharacterCreationCameraFlagModel))
-		
+	if (characterComponentVariation.componentId === 2) {
+		creatorCameraEdit(
+			JSON.stringify({
+				characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+				withRemovingComponentVariations: true
+			} as CharacterCreationCameraFlagModel)
+		);
 	}
 	mp.console.logInfo(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION + ' ' + characterComponentVariationJson);
+	mp.players.local.setComponentVariation(
+		characterComponentVariation.componentId,
+		characterComponentVariation.drawableId,
+		characterComponentVariation.textureId,
+		characterComponentVariation.paletteId
+	);
 
-	mp.players.local.setComponentVariation(characterComponentVariation.componentId, characterComponentVariation.drawableId, characterComponentVariation.textureId, characterComponentVariation.paletteId);
+	creatorCameraEdit(
+		JSON.stringify({
+			characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+			withRemovingComponentVariations: true
+		} as CharacterCreationCameraFlagModel)
+	);
 
 	// TODO save variable for component variation to the player
+}
+
+rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, (characterComponentVariationJson: string) =>
+	setCharacterComponentVariation(characterComponentVariationJson)
+);
+
+// TODO probably needed
+function applyCreatorOutfit(gender: number) {
+	if (gender == 0) {
+		mp.players.local.setDefaultComponentVariation();
+		mp.players.local.setComponentVariation(3, 15, 0, 2);
+		mp.players.local.setComponentVariation(4, 21, 0, 2);
+		mp.players.local.setComponentVariation(6, 34, 0, 2);
+		mp.players.local.setComponentVariation(8, 15, 0, 2);
+		mp.players.local.setComponentVariation(11, 15, 0, 2);
+	} else {
+		mp.players.local.setDefaultComponentVariation();
+		mp.players.local.setComponentVariation(3, 15, 0, 2);
+		mp.players.local.setComponentVariation(4, 10, 0, 2);
+		mp.players.local.setComponentVariation(6, 35, 0, 2);
+		mp.players.local.setComponentVariation(8, 15, 0, 2);
+		mp.players.local.setComponentVariation(11, 15, 0, 2);
+	}
+}
+
+rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, (gender: number) => {
+	// TODO some bug here when changin the gender the face does not change
+	// switch (gender) {
+	// 	case 0: {
+	// 		setHeadBlendData(
+	// 			JSON.stringify({
+	// 				shapeFirstId: 21,
+	// 				shapeSecondId: 0,
+	// 				shapeThirdId: 0,
+	// 				skinFirstId: 21,
+	// 				skinSecondId: 0,
+	// 				skinThirdId: 0,
+	// 				shapeMix: 0,
+	// 				skinMix: 0,
+	// 				thirdMix: 0,
+	// 				isParent: false
+	// 			} as CharacterHeadBlendData)
+	// 		);
+	// 		break;
+	// 	}
+	// 	case 1: {
+	// 		setHeadBlendData(
+	// 			JSON.stringify({
+	// 				shapeFirstId: 21,
+	// 				shapeSecondId: 0,
+	// 				shapeThirdId: 0,
+	// 				skinFirstId: 21,
+	// 				skinSecondId: 0,
+	// 				skinThirdId: 0,
+	// 				shapeMix: 0,
+	// 				skinMix: 0,
+	// 				thirdMix: 0,
+	// 				isParent: false
+	// 			} as CharacterHeadBlendData)
+	// 		);
+	// 		break;
+	// 	}
+	// }
+	rpc.callServer(CreatorEvents.SERVER_CHANGE_GENDER, gender);
+	applyCreatorOutfit(gender);
+});
+
+rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
+	return await rpc.callServer(CreatorEvents.SERVER_GET_GENDER, '');
 });
 
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {

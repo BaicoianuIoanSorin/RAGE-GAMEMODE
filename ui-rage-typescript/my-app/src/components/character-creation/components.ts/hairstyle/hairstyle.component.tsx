@@ -19,20 +19,32 @@ export const HairStyleComponent: React.FC = () => {
     hairList[gender]
   );
   const [selectedHairStyle, setSelectedHairStyle] =
-    useState<CharacterHairStyle>();
+    useState<CharacterHairStyle>(hairList[gender][0]);
 
   let rpc: any = null;
   if ("rpc" in window && "callClient" in window.rpc) {
     rpc = window.rpc;
   }
 
+  useEffect(() => {
+    if (rpc) {
+      rpc.callClient(CreatorEvents.CLIENT_GET_GENDER).then((gender: number) => {
+        setGender(gender);
+        setHairStyles(hairList[gender]);
+      });
+    }
+  }, [])
+
+  useEffect(() => {
+    if(rpc) {
+        rpc.callClient(CreatorEvents.CLIENT_CHANGE_GENDER, gender);
+    }
+  }, [gender])
+
   const handleGenderChange = (newGender: number) => {
     console.log(newGender);
     setGender(newGender);
     setHairStyles(hairList[newGender]);
-    if (rpc) {
-      rpc.callClient(CreatorEvents.SERVER_CHANGE_GENDER, newGender);
-    }
   };
 
   const isHairStyleSelected = (hairStyle: CharacterHairStyle): boolean => {
@@ -49,7 +61,7 @@ export const HairStyleComponent: React.FC = () => {
       componentId: 2,
       drawableId: hairStyle.id,
       textureId: 0,
-      paletteId: 0,
+      paletteId: 2,
     } as CharacterComponentVariation;
 
     if (rpc) {
@@ -69,7 +81,7 @@ export const HairStyleComponent: React.FC = () => {
                 name: "Hair Color",
                 scope: CharacterCreationScope.HAIR_COLOR,
                 // id does not matter for hair color
-                id: 0,
+                id: gender,
                 colorChoosen: color,
             } as CharacterCreationData)
           );

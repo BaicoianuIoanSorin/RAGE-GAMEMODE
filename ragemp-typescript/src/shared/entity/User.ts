@@ -29,6 +29,12 @@ export class User {
     @Column({ default: 0 }) // Default value for helper
     helper: number = 0;
 
+    @Column({ default: 0 }) // Default value for gender
+    gender: number = 0;
+
+    @Column({ default: 0 }) // Default value for eyeColor
+    eyeColor: number = 0;
+
     constructor(username: string, password: string, email: string) {
         this.username = username;
         this.password = password;

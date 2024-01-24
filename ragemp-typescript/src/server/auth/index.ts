@@ -7,6 +7,8 @@ import { User } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
 
+const freemodeCharacters = [mp.joaat("mp_m_freemode_01"), mp.joaat("mp_f_freemode_01")];
+
 const userRepository = AppDataSource.getRepository(User);
 const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHunger);
 
@@ -49,12 +51,17 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		}
 
 		// TODO maybe add an util class for player commands inside player shared folder
+		// TODO add the gender variable here later
 		player.setVariables({
-			[PlayersVariables.serverId]: user.id,
+			[PlayersVariables.ServerId]: user.id,
 			[PlayersVariables.Admin]: user.admin,
-			[PlayersVariables.Helper]: user.helper
+			[PlayersVariables.Helper]: user.helper,
+			[PlayersVariables.Gender]: user.gender,
+			[PlayersVariables.EyeColor]: user.eyeColor,
 		});
 
+		player.model = freemodeCharacters[user.gender];
+		player.eyeColor = user.eyeColor;
 		player.health = 100;
 		await rpc.call(AUTH.SERVER_UPDATE_LAST_LOGIN, player.name);
 		await rpc.call(

@@ -4,11 +4,14 @@ import { CreatorEvents } from '@shared/character-creation/events.constants';
 import { CharacterComponentVariation, CharacterCreationCamera, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay } from '@shared/character-creation/model';
 import { Character } from '@shared/entity/Character';
 import { User } from '@shared/entity/User';
+import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { CharacterCreationCommands } from '@shared/player/commands';
 import * as rpc from 'rage-rpc';
 
 const userRepository = AppDataSource.getRepository(User);
 const characterRepository = AppDataSource.getRepository(Character);
+
+const freemodeCharacters = [mp.joaat("mp_m_freemode_01"), mp.joaat("mp_f_freemode_01")];
 
 rpc.register(CreatorEvents.SERVER_CHECK_IF_CHARACTER_EXISTS, async (playerId: number) => {
 	const user: User | null = await userRepository.findOneBy({ username: mp.players.at(playerId).name });
@@ -31,6 +34,7 @@ rpc.register(CreatorEvents.SERVER_CREATOR_SET_EYE_COLOR, (eyeColor: number, info
 
     if(player) {
         player.eyeColor = eyeColor;
+        player.setVariable(PlayersVariables.EyeColor, eyeColor);
     }
 });
 rpc.register(CreatorEvents.SERVER_SEND_PLAYER_TO_DIMENSION, async (dimension: number, info) => {
@@ -49,7 +53,7 @@ rpc.register(CharacterCreationCommands.SET_HEAD_OVERLAY, async (argsJSON, info) 
         primaryColor: Number(args[3]),
         secondaryColor: Number(args[4]),
     } as CharacterHeadOverlay;
-
+    
     let player: PlayerMp | undefined = findPlayerByName(info.player.name);
     if (!player) {
         console.error(`command:${CharacterCreationCommands.SET_HEAD_OVERLAY} -> ${args} -> player not found`);
@@ -149,9 +153,38 @@ rpc.register(CreatorEvents.SERVER_GET_COMPONENT_VARIATION, (componentId: number,
 
     const { drawable, texture, palette } = player.getClothes(componentId);
     return {
-        componentId,
-        drawable,
-        texture,
-        palette,
+        componentId: componentId,
+        drawableId: drawable,
+        textureId: texture,
+        paletteId: palette,
     } as CharacterComponentVariation;
 })
+
+rpc.register(CreatorEvents.SERVER_CHANGE_GENDER, (gender: number, info) => {
+    console.log(`${CreatorEvents.SERVER_CHANGE_GENDER} -> gender: ${gender}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_CHANGE_GENDER} -> gender ${gender} -> player not found`);
+        return;
+    }
+
+    player.setVariable(PlayersVariables.Gender, gender);
+    player.model = freemodeCharacters[gender];
+    let eyeColor: number | undefined = player.getVariable(PlayersVariables.EyeColor);
+    player.eyeColor = eyeColor ? eyeColor : 0;
+});
+
+rpc.register(CreatorEvents.SERVER_GET_GENDER, (something: string, info) => {
+    console.log(`${CreatorEvents.SERVER_GET_GENDER} -> player: ${info.player.name}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_GET_GENDER} -> player not found`);
+        return;
+    }
+
+    return player?.getVariable(PlayersVariables.Gender);
+ });

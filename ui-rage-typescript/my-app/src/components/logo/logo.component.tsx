@@ -4,7 +4,7 @@ const Logo = () => {
   return (
     <div className="logo-container">
       <p>
-        <span className="logo">RPG.DAFFW.RO</span>
+        <span className="logo">PALETO BAY</span>
       </p>
     </div>
   );

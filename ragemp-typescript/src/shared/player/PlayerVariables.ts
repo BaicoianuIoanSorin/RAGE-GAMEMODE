@@ -1,6 +1,10 @@
 export const PlayersVariables = {
-    serverId: 'serverId',
-    isLoggedIn: 'isLoggedIn',
+    ServerId: 'serverId',
+    Email: 'email',
     Admin: 'admin',
     Helper: 'helper',
+    ThirstyLevel: 'thirstyLevel',
+    HungryLevel: 'hungryLevel',
+    Gender: 'gender',
+    EyeColor: 'eyeColor',
 };
