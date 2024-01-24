@@ -52,9 +52,9 @@ export interface CharacterFaceFeature {
 
 export interface CharacterComponentVariation {
     componentId: number;
-    drawable: number;
-    texture: number;
-    palette: number;
+    drawableId: number;
+    textureId: number;
+    paletteId: number;
 }
 
 export interface CharacterCreationCameraFlagModel {
@@ -321,3 +321,97 @@ export const COLORS: Map<number, string> = new Map([
         [41, "Emma"],
         [45, "Misty"]
     ]);
+    
+    export interface CharacterHairStyle {
+        id: number;
+        name: string;
+        collection: string;
+        overlay: string;
+    }
+    
+   export const hairList: CharacterHairStyle[][] = [
+        // male
+        [
+            {id: 0, name: "Close Shave", collection: "mpbeach_overlays", overlay: "Clothing_M_2_0"},
+            {id: 1, name: "Buzzcut", collection: "multiplayer_overlays", overlay: "Clothing_M_2_1"},
+            {id: 2, name: "Faux Hawk", collection: "multiplayer_overlays", overlay: "Clothing_M_2_2"},
+            {id: 3, name: "Hipster", collection: "multiplayer_overlays", overlay: "Clothing_M_2_3"},
+            {id: 4, name: "Side Parting", collection: "multiplayer_overlays", overlay: "Clothing_M_2_4"},
+            {id: 5, name: "Shorter Cut", collection: "multiplayer_overlays", overlay: "Clothing_M_2_5"},
+            {id: 6, name: "Biker", collection: "multiplayer_overlays", overlay: "Clothing_M_2_6"},
+            {id: 7, name: "Ponytail", collection: "multiplayer_overlays", overlay: "Clothing_M_2_7"},
+            {id: 8, name: "Cornrows", collection: "multiplayer_overlays", overlay: "Clothing_M_2_8"},
+            {id: 9, name: "Slicked", collection: "multiplayer_overlays", overlay: "Clothing_M_2_9"},
+            {id: 10, name: "Short Brushed", collection: "multiplayer_overlays", overlay: "Clothing_M_2_10"},
+            {id: 11, name: "Spikey", collection: "multiplayer_overlays", overlay: "Clothing_M_2_11"},
+            {id: 12, name: "Caesar", collection: "multiplayer_overlays", overlay: "Clothing_M_2_12"},
+            {id: 13, name: "Chopped", collection: "multiplayer_overlays", overlay: "Clothing_M_2_13"},
+            {id: 14, name: "Dreads", collection: "multiplayer_overlays", overlay: "Clothing_M_2_14"},
+            {id: 15, name: "Long Hair", collection: "multiplayer_overlays", overlay: "Clothing_M_2_15"},
+            {id: 16, name: "Shaggy Curls", collection: "multiplayer_overlays", overlay: "Clothing_M_2_16"},
+            {id: 17, name: "Surfer Dude", collection: "multiplayer_overlays", overlay: "Clothing_M_2_17"},
+            {id: 18, name: "Short Side Part", collection: "multiplayer_overlays", overlay: "Clothing_M_2_18"},
+            {id: 19, name: "High Slicked Sides", collection: "multiplayer_overlays", overlay: "Clothing_M_2_19"},
+            {id: 20, name: "Long Slicked", collection: "multiplayer_overlays", overlay: "Clothing_M_2_20"},
+            {id: 21, name: "Hipster Youth", collection: "multiplayer_overlays", overlay: "Clothing_M_2_21"},
+            {id: 22, name: "Mullet", collection: "multiplayer_overlays", overlay: "Clothing_M_2_22"},
+            {id: 24, name: "Classic Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_M_2_24"},
+            {id: 25, name: "Palm Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_M_2_25"},
+            {id: 26, name: "Lightning Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_M_2_26"},
+            {id: 27, name: "Whipped Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_M_2_27"},
+            {id: 28, name: "Zig Zag Cornrows", collection: "mplowrider2_overlays", overlay: "Clothing_M_2_28"},
+            {id: 29, name: "Snail Cornrows", collection: "mplowrider2_overlays", overlay: "Clothing_M_2_29"},
+            {id: 30, name: "Hightop", collection: "mplowrider2_overlays", overlay: "Clothing_M_2_30"},
+            {id: 31, name: "Loose Swept Back", collection: "mpbiker_overlays", overlay: "Clothing_M_2_31"},
+            {id: 32, name: "Undercut Swept Back", collection: "mpbiker_overlays", overlay: "Clothing_M_2_32"},
+            {id: 33, name: "Undercut Swept Side", collection: "mpbiker_overlays", overlay: "Clothing_M_2_33"},
+            {id: 34, name: "Spiked Mohawk", collection: "mpbiker_overlays", overlay: "Clothing_M_2_34"},
+            {id: 35, name: "Mod", collection: "mpbiker_overlays", overlay: "Clothing_M_2_35"},
+            {id: 36, name: "Layered Mod", collection: "mpbiker_overlays", overlay: "Clothing_M_2_36"},
+            {id: 72, name: "Flattop", collection: "mpgunrunning_overlays", overlay: "Clothing_M_2_72"},
+            {id: 73, name: "Military Buzzcut", collection: "mpgunrunning_overlays", overlay: "Clothing_M_2_73"}
+        ],
+        // female
+        [
+            {id: 0, name: "Close Shave", collection: "mpbeach_overlays", overlay: "Clothing_F_2_0"},
+            {id: 1, name: "Short", collection: "multiplayer_overlays", overlay: "Clothing_F_2_1"},
+            {id: 2, name: "Layered Bob", collection: "multiplayer_overlays", overlay: "Clothing_F_2_2"},
+            {id: 3, name: "Pigtails", collection: "multiplayer_overlays", overlay: "Clothing_F_2_3"},
+            {id: 4, name: "Ponytail", collection: "multiplayer_overlays", overlay: "Clothing_F_2_4"},
+            {id: 5, name: "Braided Mohawk", collection: "multiplayer_overlays", overlay: "Clothing_F_2_5"},
+            {id: 6, name: "Braids", collection: "multiplayer_overlays", overlay: "Clothing_F_2_6"},
+            {id: 7, name: "Bob", collection: "multiplayer_overlays", overlay: "NG_F_Hair_007"},
+            {id: 8, name: "Faux Hawk", collection: "multiplayer_overlays", overlay: "Clothing_F_2_8"},
+            {id: 9, name: "French Twist", collection: "multiplayer_overlays", overlay: "Clothing_F_2_9"},
+            {id: 10, name: "Long Bob", collection: "multiplayer_overlays", overlay: "Clothing_F_2_10"},
+            {id: 11, name: "Loose Tied", collection: "multiplayer_overlays", overlay: "Clothing_F_2_11"},
+            {id: 12, name: "Pixie", collection: "multiplayer_overlays", overlay: "Clothing_F_2_12"},
+            {id: 13, name: "Shaved Bangs", collection: "multiplayer_overlays", overlay: "Clothing_F_2_13"},
+            {id: 14, name: "Top Knot", collection: "multiplayer_overlays", overlay: "Clothing_F_2_14"},
+            {id: 15, name: "Wavy Bob", collection: "multiplayer_overlays", overlay: "Clothing_F_2_15"},
+            {id: 16, name: "Messy Bun", collection: "multiplayer_overlays", overlay: "Clothing_F_2_16"},
+            {id: 17, name: "Pin Up Girl", collection: "multiplayer_overlays", overlay: "Clothing_F_2_17"},
+            {id: 18, name: "Tight Bun", collection: "multiplayer_overlays", overlay: "Clothing_F_2_18"},
+            {id: 19, name: "Twisted Bob", collection: "multiplayer_overlays", overlay: "Clothing_F_2_19"},
+            {id: 20, name: "Flapper Bob", collection: "multiplayer_overlays", overlay: "Clothing_F_2_20"},
+            {id: 21, name: "Big Bangs", collection: "multiplayer_overlays", overlay: "Clothing_F_2_21"},
+            {id: 22, name: "Braided Top Knot", collection: "multiplayer_overlays", overlay: "Clothing_F_2_22"},
+            {id: 23, name: "Mullet", collection: "multiplayer_overlays", overlay: "Clothing_F_2_23"},
+            {id: 25, name: "Pinched Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_F_2_25"},
+            {id: 26, name: "Leaf Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_F_2_26"},
+            {id: 27, name: "Zig Zag Cornrows", collection: "mplowrider_overlays", overlay: "Clothing_F_2_27"},
+            {id: 28, name: "Pigtail Bangs", collection: "mplowrider2_overlays", overlay: "Clothing_F_2_28"},
+            {id: 29, name: "Wave Braids", collection: "mplowrider2_overlays", overlay: "Clothing_F_2_29"},
+            {id: 30, name: "Coil Braids", collection: "mplowrider2_overlays", overlay: "Clothing_F_2_30"},
+            {id: 31, name: "Rolled Quiff", collection: "mplowrider2_overlays", overlay: "Clothing_F_2_31"},
+            {id: 32, name: "Loose Swept Back", collection: "mpbiker_overlays", overlay: "Clothing_F_2_32"},
+            {id: 33, name: "Undercut Swept Back", collection: "mpbiker_overlays", overlay: "Clothing_F_2_33"},
+            {id: 34, name: "Undercut Swept Side", collection: "mpbiker_overlays", overlay: "Clothing_F_2_34"},
+            {id: 35, name: "Spiked Mohawk", collection: "mpbiker_overlays", overlay: "Clothing_F_2_35"},
+            {id: 36, name: "Bandana and Braid", collection: "multiplayer_overlays", overlay: "Clothing_F_2_36"},
+            {id: 37, name: "Layered Mod", collection: "mpbiker_overlays", overlay: "Clothing_F_2_37"},
+            {id: 38, name: "Skinbyrd", collection: "mpbiker_overlays", overlay: "Clothing_F_2_38"},
+            {id: 76, name: "Neat Bun", collection: "mpgunrunning_overlays", overlay: "Clothing_F_2_76"},
+            {id: 77, name: "Short Bob", collection: "mpgunrunning_overlays", overlay: "Clothing_F_2_77"}
+        ]
+    ];

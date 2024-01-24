@@ -263,6 +263,14 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, (characterCreat
 	}
 });
 
+rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, (characterComponentVariationJson: string) => {
+	let characterComponentVariation: CharacterComponentVariation = JSON.parse(characterComponentVariationJson);
+
+	mp.console.logInfo(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION + ' ' + characterComponentVariationJson);
+
+	mp.players.local.setComponentVariation(characterComponentVariation.componentId, characterComponentVariation.drawableId, characterComponentVariation.textureId, characterComponentVariation.paletteId);
+});
+
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
 	angle = angle * 0.0174533;
 	position.y = position.y + distance * Math.sin(angle);

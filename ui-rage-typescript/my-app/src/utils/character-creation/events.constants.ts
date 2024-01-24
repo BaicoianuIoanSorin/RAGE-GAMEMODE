@@ -11,6 +11,10 @@ export enum CreatorEvents {
     CLIENT_CREATOR_SET_HEAD_BLEND_DATA = 'client:CreatorSetHeadBlendData',
     CLIENT_CREATOR_SET_FACE_FEATURE = 'client:CreatorSetFaceFeature',
     CLIENT_SHOW_CHARACTER_OVERALL = 'client:ShowCharacterOverall',
+	CLIENT_SET_COMPONENT_VARIATION = 'client:setComponentVariation',
+	SERVER_CREATOR_SET_EYE_COLOR = 'server:CreatorSetEyeColor',
+    SERVER_CHANGE_GENDER = 'server:changeGender',
+    SERVER_GET_GENDER = 'server:getGender',
     
     SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 

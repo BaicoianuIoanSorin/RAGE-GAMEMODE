@@ -151,7 +151,7 @@ export const CharacterHeadBlendOverlayComponent: React.FC = () => {
 
   return (
     <div className="character-head-blend-overlay-container">
-      <h3>Choose your father</h3>
+      <div className="heading-container">Choose your father</div>
       <div className="scope-choosing-container">
         {Array.from(FATHER_NAMES_MAPPER).map(([key, value]) => (
           <div onClick={() => handleScopeChange(key)}>
@@ -164,7 +164,7 @@ export const CharacterHeadBlendOverlayComponent: React.FC = () => {
           </div>
         ))}
       </div>
-      <h3>Choose your mother</h3>
+      <div className="heading-container">Choose your mother</div>
       <div className="scope-choosing-container">
         {Array.from(MOTHER_NAMES_MAPPER).map(([key, value]) => (
           <div onClick={() => handleScopeChange(key)}>

@@ -1,25 +1,39 @@
-.character-head-blend-overlay-container {
-    // display: flex; // Use Flexbox
-    // flex-direction: column; // Stack children vertically
-    // justify-content: center; // Center children vertically
-    // align-items: center; // Center children horizontally
-    // text-align: center; // Center text horizontally
-    // padding: 10px;
-
+.hairstyle-container {
     display: flex;
     flex-wrap: wrap; // Allow items to wrap onto the next line
     justify-content: center; // Align items to the start of the container
     gap: 5px; // Adjust as needed for space between items
     padding: 10px; // Adjust as needed for padding inside the container
-}
-  
-  .heading-container {
-    text-align: center; // Center text horizontally
-     margin-bottom: 20px; // Space between the text and the buttons
+
+    .gender-selection-text {
+        margin-bottom: 20px; // Space between the text and the buttons
         font-size: 1.5em; // Make the text a bit larger
-  }
-  
-  .scope-choosing-container {
+        text-align: center;
+        // Add more styles as needed
+    }
+
+    .buttons-container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; // Center buttons horizontally in their container
+        gap: 10px; // Add space between buttons
+    }
+
+    .gender-button {
+        padding: 10px 20px;
+        margin: 5px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f4f4f4; // Default background color
+        &:hover {
+            background-color: #e2e2e2; // Slightly darker on hover
+        }
+        // Add more styles as needed
+    }
+}
+
+.scope-choosing-container {
     display: flex;
     overflow-x: auto; // Enable horizontal scrolling
     gap: 10px; // Adjust as needed for space between items
