@@ -50,7 +50,7 @@ export const EyeChangingColorComponent: React.FC = () => {
             scope: CharacterCreationScope.EYE_COLOR,
             // id does not matter for eye color
             id: 0,
-            colorChoosen: selectedEyeColor,
+            colorChoosen: newEyeColor,
         } as CharacterCreationData;
         rpc.callClient(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, JSON.stringify(characterCreationData));
     }
@@ -62,9 +62,9 @@ export const EyeChangingColorComponent: React.FC = () => {
 
   const getImage = (eyeColorId: number): string => {
    // TODO add images for eyes
-
+   const nameOfEyeColor = eyeColors[eyeColorId];
    // TODO for now default
-   return require('../../../../assets/NEW-PB-LOGO-1.png');
+   return require(`../../../../assets/Eye Models/${nameOfEyeColor}.png`);
   };
 
   return (

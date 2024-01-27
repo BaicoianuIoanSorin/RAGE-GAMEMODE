@@ -309,47 +309,30 @@ function applyCreatorOutfit() {
 }
 
 rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, (gender: number) => {
-	// TODO when setting the outfit again, it does remove the items for some reason
+	// Ensure applyCreatorOutfit is not removing items unintentionally
 	applyCreatorOutfit();
-	// TODO some bug here when changin the gender the face does not change
-	// switch (gender) {
-	// 	case 0: {
-	// 		setHeadBlendData(
-	// 			JSON.stringify({
-	// 				shapeFirstId: 21,
-	// 				shapeSecondId: 0,
-	// 				shapeThirdId: 0,
-	// 				skinFirstId: 21,
-	// 				skinSecondId: 0,
-	// 				skinThirdId: 0,
-	// 				shapeMix: 0,
-	// 				skinMix: 0,
-	// 				thirdMix: 0,
-	// 				isParent: false
-	// 			} as CharacterHeadBlendData)
-	// 		);
-	// 		break;
-	// 	}
-	// 	case 1: {
-	// 		setHeadBlendData(
-	// 			JSON.stringify({
-	// 				shapeFirstId: 21,
-	// 				shapeSecondId: 0,
-	// 				shapeThirdId: 0,
-	// 				skinFirstId: 21,
-	// 				skinSecondId: 0,
-	// 				skinThirdId: 0,
-	// 				shapeMix: 0,
-	// 				skinMix: 0,
-	// 				thirdMix: 0,
-	// 				isParent: false
-	// 			} as CharacterHeadBlendData)
-	// 		);
-	// 		break;
-	// 	}
-	// }
+  
+	// It's important to ensure that the correct data is passed to setHeadBlendData based on gender
+	const defaultHeadBlendData = JSON.stringify({
+	  shapeFirstId: gender === 0 ? 21 : 45, // Example IDs, replace with actual defaults
+	  shapeSecondId: 0,
+	  shapeThirdId: 0,
+	  skinFirstId: gender === 0 ? 21 : 45, // Example IDs, replace with actual defaults
+	  skinSecondId: 0,
+	  skinThirdId: 0,
+	  shapeMix: 0,
+	  skinMix: 0,
+	  thirdMix: 0,
+	  isParent: false,
+	} as CharacterHeadBlendData);
+  
+	// Update the character's appearance based on the new gender
+	setHeadBlendData(defaultHeadBlendData);
+  
+	// Notify the server about the gender change
 	rpc.callServer(CreatorEvents.SERVER_CHANGE_GENDER, gender);
-});
+  });
+  
 
 rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
 	return await rpc.callServer(CreatorEvents.SERVER_GET_GENDER, '');
