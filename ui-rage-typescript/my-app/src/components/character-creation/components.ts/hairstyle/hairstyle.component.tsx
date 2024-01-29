@@ -7,12 +7,17 @@ import {
   CharacterCreationData,
   CharacterCreationScope,
   CharacterHairStyle,
+  CharacterHairStyleComponentInformation,
   hairList,
 } from "../../../../utils/character-creation/model";
 import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 import { RoundedBoxWithColorComponent } from "../rounded-box-with-color/rounded-box-with-color.component";
 
-export const HairStyleComponent: React.FC = () => {
+interface HairStyleProps {
+  onChangeEvent: (characterHairStyleComponentInformation: CharacterHairStyleComponentInformation) => void;
+}
+
+export const HairStyleComponent: React.FC<HairStyleProps> = (props: HairStyleProps) => {
   // 0 - male, 1 - female
   const [gender, setGender] = useState<number>(0);
   const [hairStyles, setHairStyles] = useState<CharacterHairStyle[]>(
@@ -31,18 +36,37 @@ export const HairStyleComponent: React.FC = () => {
       rpc.callClient(CreatorEvents.CLIENT_GET_GENDER).then((gender: number) => {
         setGender(gender);
         setHairStyles(hairList[gender]);
+        props.onChangeEvent({
+          characterHairStyle: selectedHairStyle,
+          gender: gender,
+        } as CharacterHairStyleComponentInformation)
       });
+    }
+    else {
+      props.onChangeEvent({
+        characterHairStyle: selectedHairStyle,
+        gender: gender,
+      } as CharacterHairStyleComponentInformation)
     }
   }, [])
 
   useEffect(() => {
     if(rpc) {
         rpc.callClient(CreatorEvents.CLIENT_CHANGE_GENDER, gender);
+        props.onChangeEvent({
+          characterHairStyle: selectedHairStyle,
+          gender: gender,
+        } as CharacterHairStyleComponentInformation)
+    }
+    else {
+      props.onChangeEvent({
+        characterHairStyle: selectedHairStyle,
+        gender: gender,
+      } as CharacterHairStyleComponentInformation)
     }
   }, [gender])
 
   const handleGenderChange = (newGender: number) => {
-    console.log(newGender);
     setGender(newGender);
     setHairStyles(hairList[newGender]);
   };
@@ -57,6 +81,11 @@ export const HairStyleComponent: React.FC = () => {
 
   const handleHairStyleChange = (hairStyle: CharacterHairStyle) => {
     setSelectedHairStyle(hairStyle);
+    props.onChangeEvent({
+      characterHairStyle: hairStyle,
+      gender: gender,
+    } as CharacterHairStyleComponentInformation)
+
     let componentVariation = {
       componentId: 2,
       drawableId: hairStyle.id,

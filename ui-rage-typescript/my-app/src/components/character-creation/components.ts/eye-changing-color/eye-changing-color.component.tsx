@@ -26,20 +26,6 @@ export const EyeChangingColorComponent: React.FC = () => {
     // TODO getting the eye color from the server - do event from client and to server and back
   }, [])
 
-//   useEffect(() => {
-//     if(rpc) {
-//         let characterCreationData: CharacterCreationData = {
-//             // name does not matter for eye color
-//             name: "Eye Color",
-//             scope: CharacterCreationScope.EYE_COLOR,
-//             // id does not matter for eye color
-//             id: 0,
-//             colorChoosen: selectedEyeColor,
-//         } as CharacterCreationData;
-//         rpc.callClient(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, JSON.stringify(characterCreationData));
-//     }
-//   }, [selectedEyeColor])
-
   const handleEyeColorChange = (newEyeColor: number) => {
     console.log(newEyeColor);
     setSelectedEyeColor(newEyeColor);
@@ -61,9 +47,7 @@ export const EyeChangingColorComponent: React.FC = () => {
   };
 
   const getImage = (eyeColorId: number): string => {
-   // TODO add images for eyes
    const nameOfEyeColor = eyeColors[eyeColorId];
-   // TODO for now default
    return require(`../../../../assets/Eye Models/${nameOfEyeColor}.png`);
   };
 
