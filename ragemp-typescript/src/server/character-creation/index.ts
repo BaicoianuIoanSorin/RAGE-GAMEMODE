@@ -37,6 +37,7 @@ rpc.register(CreatorEvents.SERVER_CREATOR_SET_EYE_COLOR, (eyeColor: number, info
         player.setVariable(PlayersVariables.EyeColor, eyeColor);
     }
 });
+
 rpc.register(CreatorEvents.SERVER_SEND_PLAYER_TO_DIMENSION, async (dimension: number, info) => {
 
 });
@@ -188,3 +189,39 @@ rpc.register(CreatorEvents.SERVER_GET_GENDER, (something: string, info) => {
 
     return player?.getVariable(PlayersVariables.Gender);
  });
+
+ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, async (characterHeadOverlayJson: string, info) => {
+    const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
+
+	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
+
+    console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS} -> SAVING ${characterHeadOverlayJson}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS} -> player not found`);
+        return;
+    }
+
+    let characterHeadOverlays: CharacterHeadOverlay[] | undefined = player.getVariable(PlayersVariables.CharacterHeadOverlays);
+
+    if(!characterHeadOverlays) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS} -> characterHeadOverlays not found`);
+        return;
+    }
+    
+    // check if the overlay exists
+    let index: number = characterHeadOverlays.findIndex((characterHeadOverlayToFind: CharacterHeadOverlay) => characterHeadOverlayToFind.id === characterHeadOverlay.id);
+    if(index === -1) {
+        // if it doesn't exist, push it
+        console.log(`pushing ${characterHeadOverlay}`)
+        characterHeadOverlays.push(characterHeadOverlay);
+    } else {
+        // if it exists, replace it
+        console.log(`replacing ${characterHeadOverlay}`)
+        characterHeadOverlays[index] = characterHeadOverlay;
+    }
+
+    player.setVariable(PlayersVariables.CharacterHeadOverlays, characterHeadOverlays);
+});

@@ -71,6 +71,11 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 				state: true
 			})
 		);
+		
+		// TODO call method for getting head overlays
+		// player.setVariable(PlayersVariables.CharacterHeadOverlays, await rpc.callClient(player, AUTH.CLIENT_GET_HEAD_OVERLAYS));
+		// for now just set it to empty array
+		player.setVariable(PlayersVariables.CharacterHeadOverlays, []);
 
 		return GENERAL_STATUS_CODES.OK;
 	} catch (error: any) {
@@ -82,8 +87,6 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
 	console.log(AUTH.SERVER_REGISTER);
 	let formFields = JSON.parse(formFieldsJSON);
-	console.log(formFields);
-	console.log(AUTH.SERVER_REGISTER);
 	let player: PlayerMp = mp.players.at(formFields.playerId);
 	if (!isElegible(player, formFields.password)) return;
 

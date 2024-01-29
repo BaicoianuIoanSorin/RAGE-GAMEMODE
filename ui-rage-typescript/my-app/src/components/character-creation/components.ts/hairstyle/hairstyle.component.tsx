@@ -31,44 +31,22 @@ export const HairStyleComponent: React.FC<HairStyleProps> = (props: HairStylePro
     rpc = window.rpc;
   }
 
-  useEffect(() => {
-    if (rpc) {
-      rpc.callClient(CreatorEvents.CLIENT_GET_GENDER).then((gender: number) => {
-        setGender(gender);
-        setHairStyles(hairList[gender]);
-        props.onChangeEvent({
-          characterHairStyle: selectedHairStyle,
-          gender: gender,
-        } as CharacterHairStyleComponentInformation)
-      });
-    }
-    else {
-      props.onChangeEvent({
-        characterHairStyle: selectedHairStyle,
-        gender: gender,
-      } as CharacterHairStyleComponentInformation)
-    }
-  }, [])
-
-  useEffect(() => {
-    if(rpc) {
-        rpc.callClient(CreatorEvents.CLIENT_CHANGE_GENDER, gender);
-        props.onChangeEvent({
-          characterHairStyle: selectedHairStyle,
-          gender: gender,
-        } as CharacterHairStyleComponentInformation)
-    }
-    else {
-      props.onChangeEvent({
-        characterHairStyle: selectedHairStyle,
-        gender: gender,
-      } as CharacterHairStyleComponentInformation)
-    }
-  }, [gender])
-
   const handleGenderChange = (newGender: number) => {
     setGender(newGender);
     setHairStyles(hairList[newGender]);
+    if(rpc) {
+        rpc.callClient(CreatorEvents.CLIENT_CHANGE_GENDER, newGender);
+        props.onChangeEvent({
+          characterHairStyle: selectedHairStyle,
+          gender: newGender,
+        } as CharacterHairStyleComponentInformation)
+    }
+    else {
+      props.onChangeEvent({
+        characterHairStyle: selectedHairStyle,
+        gender: newGender,
+      } as CharacterHairStyleComponentInformation)
+    }
   };
 
   const isHairStyleSelected = (hairStyle: CharacterHairStyle): boolean => {

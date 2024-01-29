@@ -143,7 +143,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 	creatorCameraEdit(characterCreationCameraFlagModelJson)
 );
 
-rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
+function setHeadOverlay(characterHeadOverlayJson: string) {
 	const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
 
 	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
@@ -174,9 +174,14 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverla
 			} as CharacterCreationCameraFlagModel)
 		);
 	}
-});
+}
 
-// TODO do hair styles and hair colors
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
+	setHeadOverlay(characterHeadOverlayJson);
+	
+	rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, characterHeadOverlayJson);
+	// TODO save head overlay to the player variables
+});
 
 function setHeadBlendData(headBlendDataJson: string) {
 	const headBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
@@ -300,39 +305,51 @@ rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, (characterComponentVa
 // TODO probably needed
 function applyCreatorOutfit() {
 	mp.players.local.setDefaultComponentVariation();
-		mp.players.local.setComponentVariation(3, 15, 0, 0);
-		mp.players.local.setComponentVariation(4, 15, 0, 0);
-		mp.players.local.setComponentVariation(6, 15, 0, 0);
-		mp.players.local.setComponentVariation(8, 15, 0, 0);
-		mp.players.local.setComponentVariation(11, 15, 0, 0);
-		mp.console.logInfo('applyCreatorOutfit');
+	mp.players.local.setComponentVariation(3, 15, 0, 0);
+	mp.players.local.setComponentVariation(4, 15, 0, 0);
+	mp.players.local.setComponentVariation(6, 15, 0, 0);
+	mp.players.local.setComponentVariation(8, 15, 0, 0);
+	mp.players.local.setComponentVariation(11, 15, 0, 0);
+	mp.console.logInfo('applyCreatorOutfit');
 }
 
-rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, (gender: number) => {
-	// Ensure applyCreatorOutfit is not removing items unintentionally
-	applyCreatorOutfit();
-  
-	// It's important to ensure that the correct data is passed to setHeadBlendData based on gender
-	const defaultHeadBlendData = JSON.stringify({
-	  shapeFirstId: gender === 0 ? 21 : 45, // Example IDs, replace with actual defaults
-	  shapeSecondId: 0,
-	  shapeThirdId: 0,
-	  skinFirstId: gender === 0 ? 21 : 45, // Example IDs, replace with actual defaults
-	  skinSecondId: 0,
-	  skinThirdId: 0,
-	  shapeMix: 0,
-	  skinMix: 0,
-	  thirdMix: 0,
-	  isParent: false,
-	} as CharacterHeadBlendData);
-  
-	// Update the character's appearance based on the new gender
-	setHeadBlendData(defaultHeadBlendData);
-  
-	// Notify the server about the gender change
-	rpc.callServer(CreatorEvents.SERVER_CHANGE_GENDER, gender);
-  });
-  
+rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, async (gender: number, info) => {
+	await rpc.callServer(CreatorEvents.SERVER_CHANGE_GENDER, gender).then(() => {
+		applyCreatorOutfit();
+
+		// It's important to ensure that the correct data is passed to setHeadBlendData based on gender
+		const defaultHeadBlendData = JSON.stringify({
+			shapeFirstId: 21,
+			shapeSecondId: 0,
+			shapeThirdId: 0,
+			skinFirstId: 21,
+			skinSecondId: 0,
+			skinThirdId: 0,
+			shapeMix: gender === 0 ? 1 : 0,
+			skinMix: gender === 0 ? 1 : 0,
+			thirdMix: 0,
+			isParent: false
+		} as CharacterHeadBlendData);
+
+		// setting head blend data
+		setHeadBlendData(defaultHeadBlendData);
+		
+		// setting head overlays
+		const characterHeadOverlays: CharacterHeadOverlay[] = player.getVariable(PlayersVariables.CharacterHeadOverlays);
+		if (characterHeadOverlays !== undefined) {
+			for (let i = 0; i < characterHeadOverlays.length; i++) {
+				const characterHeadOverlay: CharacterHeadOverlay = characterHeadOverlays[i];
+				setHeadOverlay(JSON.stringify(characterHeadOverlay));
+			}
+		}
+		// TODO when gender resets, it takes all parameters already set as well, just the eyes remained as previous (which is already done)
+
+	});
+});
+
+function setHeadOverlaysFromPlayer() {
+	
+}
 
 rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
 	return await rpc.callServer(CreatorEvents.SERVER_GET_GENDER, '');

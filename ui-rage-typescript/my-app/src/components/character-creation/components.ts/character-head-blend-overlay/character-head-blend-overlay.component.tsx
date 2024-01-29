@@ -37,7 +37,6 @@ export const CharacterHeadBlendOverlayComponent: React.FC = () => {
   };
 
   const handleScopeChange = (id: number) => {
-    console.log(id);
     if (MOTHER_IDS.includes(id)) {
       setSelectedMotherId(isBoxComponentSelected(id) ? undefined : id);
       if(selectedFatherId !== undefined) {
