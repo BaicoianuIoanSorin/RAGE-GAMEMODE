@@ -176,17 +176,16 @@ function setHeadOverlay(characterHeadOverlayJson: string) {
 	}
 }
 
-rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, (characterHeadOverlayJson: string) => {
-	setHeadOverlay(characterHeadOverlayJson);
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, async (characterHeadOverlayJson: string) => {
+	await setHeadOverlay(characterHeadOverlayJson);
 	
-	rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, characterHeadOverlayJson);
+	await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, characterHeadOverlayJson);
 	// TODO save head overlay to the player variables
 });
 
-function setHeadBlendData(headBlendDataJson: string) {
+async function setHeadBlendData(headBlendDataJson: string) {
 	const headBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA + ' ' + headBlendDataJson);
-	console.log(headBlendDataJson);
 
 	mp.players.local.setHeadBlendData(
 		headBlendData.shapeFirstId,
@@ -207,14 +206,17 @@ function setHeadBlendData(headBlendDataJson: string) {
 			withRemovingComponentVariations: true
 		} as CharacterCreationCameraFlagModel)
 	);
-	// TODO save head blend data to the player variables
+
+	await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA, headBlendDataJson);
 }
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA, (headBlendDataJson: string) => setHeadBlendData(headBlendDataJson));
 
-rpc.register(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, (faceFeatureJson: string) => {
-	const faceFeature: CharacterFaceFeature = JSON.parse(faceFeatureJson);
+function setFaceFeature(faceFeatureJson: string) {
+	mp.console.logInfo("setFaceFeature: " + faceFeatureJson);
 
+	const faceFeature: CharacterFaceFeature = JSON.parse(faceFeatureJson);
+	
 	mp.players.local.setFaceFeature(faceFeature.id, faceFeature.scale);
 
 	creatorCameraEdit(
@@ -223,6 +225,12 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, (faceFeatureJson: st
 			withRemovingComponentVariations: true
 		} as CharacterCreationCameraFlagModel)
 	);
+}
+
+rpc.register(CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, async (faceFeatureJson: string) => {
+	setFaceFeature(faceFeatureJson);
+
+	await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES, faceFeatureJson);
 });
 
 rpc.register(CreatorEvents.CLIENT_SHOW_CHARACTER_OVERALL, () => {
@@ -334,22 +342,31 @@ rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, async (gender: number, info) =>
 		// setting head blend data
 		setHeadBlendData(defaultHeadBlendData);
 		
+		// TODO here the head overlays are not set properly
 		// setting head overlays
-		const characterHeadOverlays: CharacterHeadOverlay[] = player.getVariable(PlayersVariables.CharacterHeadOverlays);
+		const characterHeadOverlays: CharacterHeadOverlay[] = info.player.getVariable(PlayersVariables.CharacterHeadOverlays);
 		if (characterHeadOverlays !== undefined) {
 			for (let i = 0; i < characterHeadOverlays.length; i++) {
 				const characterHeadOverlay: CharacterHeadOverlay = characterHeadOverlays[i];
 				setHeadOverlay(JSON.stringify(characterHeadOverlay));
 			}
 		}
+		
+
+		// TODO here the face feature is not set properly
+		// setting face features
+		const characterFaceFeatures: CharacterFaceFeature[] = info.player.getVariable(PlayersVariables.CharacterFaceFeatures);
+		if (characterFaceFeatures !== undefined) {
+			for (let i = 0; i < characterHeadOverlays.length; i++) {
+				const characterFaceFeature: CharacterFaceFeature = characterFaceFeatures[i];
+				mp.console.logWarning('characterFaceFeature UPDATING: ' + JSON.stringify(characterFaceFeature));
+				setFaceFeature(JSON.stringify(characterFaceFeature));
+			}
+		}
 		// TODO when gender resets, it takes all parameters already set as well, just the eyes remained as previous (which is already done)
 
 	});
 });
-
-function setHeadOverlaysFromPlayer() {
-	
-}
 
 rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
 	return await rpc.callServer(CreatorEvents.SERVER_GET_GENDER, '');

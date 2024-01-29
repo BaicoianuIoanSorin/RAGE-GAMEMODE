@@ -225,3 +225,54 @@ rpc.register(CreatorEvents.SERVER_GET_GENDER, (something: string, info) => {
 
     player.setVariable(PlayersVariables.CharacterHeadOverlays, characterHeadOverlays);
 });
+
+rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA, async (headBlendDataJson: string, info) => {
+    const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(headBlendDataJson);
+
+    console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA} -> SAVING ${headBlendDataJson}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA} -> player not found`);
+        return;
+    }
+
+    player.setVariable(PlayersVariables.CharacterHeadBlendData, characterHeadOverlay);
+});
+
+rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES, async (faceFeatureJson: string, info) => {
+    const faceFeature: CharacterFaceFeature = JSON.parse(faceFeatureJson);
+
+    console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES} -> SAVING ${faceFeatureJson}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES} -> player not found`);
+        return;
+    }
+
+    let characterFaceFeatures: CharacterFaceFeature[] | undefined = player.getVariable(PlayersVariables.CharacterFaceFeatures);
+
+    if(!characterFaceFeatures) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS} -> characterFaceFeatures not found`);
+        return;
+    }
+    
+    // check if the overlay exists
+    let index: number = characterFaceFeatures.findIndex((characterFaceFeatureToFind: CharacterFaceFeature) => characterFaceFeatureToFind.id === faceFeature.id);
+    if(index === -1) {
+        // if it doesn't exist, push it
+        console.log(`pushing ${faceFeature}`)
+        characterFaceFeatures.push(faceFeature);
+    } else {
+        // if it exists, replace it
+        console.log(`replacing ${faceFeature}`)
+        characterFaceFeatures[index] = faceFeature;
+    }
+    
+    console.log(`characterFaceFeatures: ${characterFaceFeatures}`);
+
+    player.setVariable(PlayersVariables.CharacterFaceFeatures, characterFaceFeatures);
+});

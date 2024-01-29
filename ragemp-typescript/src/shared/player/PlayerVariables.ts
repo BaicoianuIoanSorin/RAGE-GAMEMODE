@@ -5,7 +5,9 @@ export const PlayersVariables = {
     Helper: 'helper',
     ThirstyLevel: 'thirstyLevel',
     HungryLevel: 'hungryLevel',
-    CharacterHeadOverlays: 'characterHeadOverlays',
     Gender: 'gender',
     EyeColor: 'eyeColor',
+    CharacterHeadOverlays: 'characterHeadOverlays',
+    CharacterHeadBlendData: 'characterHeadBlendData',
+    CharacterFaceFeatures: 'characterFaceFeatures',
 };

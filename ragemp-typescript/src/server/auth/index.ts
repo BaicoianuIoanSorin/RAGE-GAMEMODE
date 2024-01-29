@@ -77,6 +77,11 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		// for now just set it to empty array
 		player.setVariable(PlayersVariables.CharacterHeadOverlays, []);
 
+		// TODO call method for getting face features
+		// player.setVariable(PlayersVariables.CharacterFaceFeatures, await rpc.callClient(player, AUTH.CLIENT_GET_FACE_FEATURES));
+		// for now just set it to empty array
+		player.setVariable(PlayersVariables.CharacterFaceFeatures, []);
+
 		return GENERAL_STATUS_CODES.OK;
 	} catch (error: any) {
 		console.log(error);

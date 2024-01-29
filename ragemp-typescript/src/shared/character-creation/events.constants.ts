@@ -19,6 +19,8 @@ export enum CreatorEvents {
     SERVER_GET_GENDER = 'server:getGender',
 	SERVER_CREATOR_SET_EYE_COLOR = 'server:CreatorSetEyeColor',
     SERVER_SAVE_CHARACTER_HEAD_OVERLAYS = 'server:saveCharacterHeadOverlays',
+    SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA = 'server:saveCharacterHeadBlendData',
+    SERVER_SAVE_CHARACTER_FACE_FEATURES = 'server:saveCharacterFaceFeatures',
     
     SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 
