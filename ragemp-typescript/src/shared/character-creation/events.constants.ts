@@ -23,6 +23,8 @@ export enum CreatorEvents {
     SERVER_SAVE_CHARACTER_FACE_FEATURES = 'server:saveCharacterFaceFeatures',
     SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS = 'server:saveCharacterComponentVariations',
     SERVER_SAVE_CHARACTER_HAIR_COLOR = 'server:saveCharacterHairColor',
+    CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE = 'client:saveCharacterDataToDatabase',
+    SERVER_SAVE_CHARACTER_DATA_TO_DATABASE = 'server:saveCharacterDataToDatabase',
     
     SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 

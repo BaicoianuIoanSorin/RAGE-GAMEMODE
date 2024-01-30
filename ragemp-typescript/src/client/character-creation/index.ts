@@ -395,6 +395,11 @@ rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
 	return await rpc.callServer(CreatorEvents.SERVER_GET_GENDER, '');
 });
 
+rpc.register(CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE, async () => {
+    console.log(`${CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE} -> SAVING`);
+	return await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_DATA_TO_DATABASE, '');
+});
+
 /*
 Sets the character head overlays that the player has saved in variables
 */

@@ -7,11 +7,18 @@ import { CharacterHeadBlendOverlayComponent } from "./components.ts/character-he
 import { CharacterHeadOverlayComponent } from "./components.ts/character-head-overlay/character-head-overlay.component";
 import { EyeChangingColorComponent } from "./components.ts/eye-changing-color/eye-changing-color.component";
 import { HairStyleComponent } from "./components.ts/hairstyle/hairstyle.component";
+import { CreatorEvents } from "../../utils/character-creation/events.constants";
+import { CANCELLED } from "dns";
+import { allowedNodeEnvironmentFlags } from "process";
 
 export const CharacterCreationComponent: React.FC = () => {
   const [resetKey, setResetKey] = useState(0); // Added a reset key
   const [showTooltip, setShowTooltip] = useState(true);
 
+  let rpc: any = null;
+  if ("rpc" in window && "callClient" in window.rpc) {
+    rpc = window.rpc;
+  }
   // variables for showing the button save
   // left side
   const [
@@ -21,7 +28,7 @@ export const CharacterCreationComponent: React.FC = () => {
   const [
     characterHairStyleComponentInformation,
     setCharacterHairStyleComponentInformation,
-  ] = useState<CharacterHairStyleComponentInformation | undefined>(undefined);
+  ] = useState<CharacterHairStyleComponentInformation>();
   const [
     isBlendOverlayChangingColorsComponentInformationFilled,
     setIsBlendOverlayChangingColorsComponentInformationFilled,
@@ -45,6 +52,13 @@ export const CharacterCreationComponent: React.FC = () => {
     newCharacterHairSyleComponentInformation: CharacterHairStyleComponentInformation
   ) => {
     console.log(newCharacterHairSyleComponentInformation);
+
+    if (characterHairStyleComponentInformation?.gender !== newCharacterHairSyleComponentInformation?.gender) {
+      setResetKey((prevKey) => prevKey + 1);
+      onChangeBlendOverlayChangingColorsComponentInformation(false);
+      alert('called');
+    }
+
     setCharacterHairStyleComponentInformation(
       newCharacterHairSyleComponentInformation
     );
@@ -53,7 +67,9 @@ export const CharacterCreationComponent: React.FC = () => {
   const onChangeEyeColorComponentInformation = (
     isEyeColorComponentInformationFilled: boolean
   ) => {
-    setIsEyeColorComponentInformationFilled(isEyeColorComponentInformationFilled);
+    setIsEyeColorComponentInformationFilled(
+      isEyeColorComponentInformationFilled
+    );
   };
 
   const onChangeBlendOverlayChangingColorsComponentInformation = (
@@ -62,7 +78,7 @@ export const CharacterCreationComponent: React.FC = () => {
     setIsBlendOverlayChangingColorsComponentInformationFilled(
       isBlendOverlayChangingColorsComponentInformationFilled
     );
-  }
+  };
 
   const onChangeCharacterFaceFeaturesComponentInformation = (
     isCharacterFaceFeaturesComponentInformationFilled: boolean
@@ -70,7 +86,7 @@ export const CharacterCreationComponent: React.FC = () => {
     setIsCharacterFaceFeaturesComponentInformationFilled(
       isCharacterFaceFeaturesComponentInformationFilled
     );
-  }
+  };
 
   const onChangeCharacterHeadBlendOverlayComponentInformation = (
     isCharacterHeadBlendOverlayComponentInformationFilled: boolean
@@ -78,7 +94,7 @@ export const CharacterCreationComponent: React.FC = () => {
     setIsCharacterHeadBlendOverlayComponentInformationFilled(
       isCharacterHeadBlendOverlayComponentInformationFilled
     );
-  }
+  };
 
   const onChangeCharacterHeadOverlayComponentInformation = (
     isCharacterHeadOverlayComponentInformationFilled: boolean
@@ -86,6 +102,16 @@ export const CharacterCreationComponent: React.FC = () => {
     setIsCharacterHeadOverlayComponentInformationFilled(
       isCharacterHeadOverlayComponentInformationFilled
     );
+  };
+
+  function onClickSaveButton() {
+    if (rpc) {
+      const response = rpc.callClient(
+        CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE
+      );
+    } else {
+      alert(`${CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE} called`);
+    }
   }
 
   function isButtonDisabled() {
@@ -99,22 +125,22 @@ export const CharacterCreationComponent: React.FC = () => {
     );
   }
 
-  useEffect(() => {
-    // Resetting the components by changing the key
-    setResetKey((prevKey) => prevKey + 1);
-    onChangeBlendOverlayChangingColorsComponentInformation(false);
-  }, [characterHairStyleComponentInformation]);
-
   // TODO add such that when the gender changes every component is reinitiliazed
   return (
     <div className="character-creation-container">
       <div className="left-side">
-        <EyeChangingColorComponent onChangeEvent={onChangeEyeColorComponentInformation}/>
+        <EyeChangingColorComponent
+          onChangeEvent={onChangeEyeColorComponentInformation}
+        />
         <HairStyleComponent
           onChangeEvent={onChangeCharacterHairStyteComponentInformation}
         />
-        <BlendOverlayChangingColorsComponent onChangeEvent={onChangeBlendOverlayChangingColorsComponentInformation}/>
-        <CharacterFaceFeaturesComponent onChangeEvent={onChangeCharacterFaceFeaturesComponentInformation}/>
+        <BlendOverlayChangingColorsComponent
+          onChangeEvent={onChangeBlendOverlayChangingColorsComponentInformation}
+        />
+        <CharacterFaceFeaturesComponent
+          onChangeEvent={onChangeCharacterFaceFeaturesComponentInformation}
+        />
       </div>
       <div className="middle-side">
         <div
@@ -122,7 +148,9 @@ export const CharacterCreationComponent: React.FC = () => {
           onMouseEnter={() => isButtonDisabled() && setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
         >
-          <button disabled={isButtonDisabled()}>Save</button>
+          <button disabled={isButtonDisabled()} onClick={onClickSaveButton}>
+            Save
+          </button>
           {isButtonDisabled() && showTooltip && (
             <div className="tooltip">
               All character creation data has to be filled in order to save the
@@ -133,9 +161,15 @@ export const CharacterCreationComponent: React.FC = () => {
       </div>
       <div className="right-side">
         <div key={resetKey}>
-          <CharacterHeadBlendOverlayComponent onChangeEvent={onChangeCharacterHeadBlendOverlayComponentInformation}/>
+          <CharacterHeadBlendOverlayComponent
+            onChangeEvent={
+              onChangeCharacterHeadBlendOverlayComponentInformation
+            }
+          />
         </div>
-        <CharacterHeadOverlayComponent onChangeEvent={onChangeCharacterHeadOverlayComponentInformation}/>
+        <CharacterHeadOverlayComponent
+          onChangeEvent={onChangeCharacterHeadOverlayComponentInformation}
+        />
       </div>
     </div>
   );

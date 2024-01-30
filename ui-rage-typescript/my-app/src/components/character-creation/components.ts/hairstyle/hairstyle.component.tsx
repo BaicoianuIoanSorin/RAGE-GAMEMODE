@@ -41,7 +41,7 @@ export const HairStyleComponent: React.FC<HairStyleProps> = (props: HairStylePro
           gender: newGender,
         } as CharacterHairStyleComponentInformation)
 
-        setSelectedHairStyle(hairList[newGender][0]);
+        setSelectedHairStyle(hairList[newGender][0])
     }
     else {
       props.onChangeEvent({

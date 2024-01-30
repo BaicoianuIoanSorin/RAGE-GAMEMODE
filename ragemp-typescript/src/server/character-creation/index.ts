@@ -328,3 +328,7 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HAIR_COLOR, async (characterHai
 
     player.setVariable(PlayersVariables.CharacterHairColor, characterHairColor);
 });
+
+rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_DATA_TO_DATABASE, async (something, info) => {
+    console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_DATA_TO_DATABASE} -> SAVING`);
+});
