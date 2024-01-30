@@ -8,13 +8,15 @@ import { CharacterHeadOverlayComponent } from "./components.ts/character-head-ov
 import { EyeChangingColorComponent } from "./components.ts/eye-changing-color/eye-changing-color.component";
 import { HairStyleComponent } from "./components.ts/hairstyle/hairstyle.component";
 import { CreatorEvents } from "../../utils/character-creation/events.constants";
-import { CANCELLED } from "dns";
-import { allowedNodeEnvironmentFlags } from "process";
+import { GENERAL_STATUS_CODES } from "../../utils/status-codes/status-codes.constants";
+import { useToast } from "@chakra-ui/react";
+import { makeToast } from "../../utils/components-used/toast";
 
 export const CharacterCreationComponent: React.FC = () => {
   const [resetKey, setResetKey] = useState(0); // Added a reset key
   const [showTooltip, setShowTooltip] = useState(true);
 
+  const toast = useToast();
   let rpc: any = null;
   if ("rpc" in window && "callClient" in window.rpc) {
     rpc = window.rpc;
@@ -103,11 +105,23 @@ export const CharacterCreationComponent: React.FC = () => {
     );
   };
 
-  function onClickSaveButton() {
+  async function onClickSaveButton() {
     if (rpc) {
-      const response = rpc.callClient(
+      const response = await rpc.callClient(
         CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE
       );
+      if (response === GENERAL_STATUS_CODES.OK) {
+        await rpc.callClient(CreatorEvents.CLIENT_SPAWN_PLAYER_FROM_CHARACTER_CREATION);
+      }
+      else {
+        makeToast(
+          rpc,
+          toast,
+          "Character creation",
+          "Character has been saved! Now you will be spawned in the world!",
+          "info"
+        );
+      }
     } else {
       alert(`${CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE} called`);
     }

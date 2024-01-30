@@ -45,6 +45,7 @@ import {
 	CharacterHeadOverlay
 } from '@shared/character-creation/model';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
+import { WINDOW_EVENTS, Window, WindowState } from '@shared/window/windows.constants';
 import * as rpc from 'rage-rpc';
 
 const player: PlayerMp = mp.players.local;
@@ -400,6 +401,26 @@ rpc.register(CreatorEvents.CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE, async () => {
 	return await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_DATA_TO_DATABASE, '');
 });
 
+rpc.register(CreatorEvents.CLIENT_SPAWN_PLAYER_FROM_CHARACTER_CREATION, async () => {
+	// TODO probably here the player should get out from a different world, but this is not done in server either for now
+	mp.players.local.freezePosition(false);
+	mp.gui.cursor.show(false, false);
+	mp.game.ui.displayRadar(true);
+	player.updateControls(true, [32]);
+
+	await rpc.call(CreatorEvents.CLIENT_CREATOR_CAMERA_SET, false);
+
+	rpc.triggerBrowser(mp.browsers.at(0), WINDOW_EVENTS.CHANGE_STATE_WINDOW,JSON.stringify([
+		{
+			windowName: Window.CHARACTER_CREATION,
+			state: false
+		},
+		{
+			windowName: Window.HUD,
+			state: true
+		}
+	] as WindowState[]));
+})
 /*
 Sets the character head overlays that the player has saved in variables
 */

@@ -93,14 +93,13 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 			})
 		);
 
-		// TODO call method for getting head overlays
-		// player.setVariable(PlayersVariables.CharacterHeadOverlays, await rpc.callClient(player, AUTH.CLIENT_GET_HEAD_OVERLAYS));
-		// for now just set it to empty array
-		const character: CharacterEntity | null = await characterRepository.findOne({where: { user: player.getVariable(PlayersVariables.ServerId) }});
+		const character: CharacterEntity | null = await characterRepository.findOne({
+			where: { user: player.getVariable(PlayersVariables.ServerId) }
+		});
 
 		if (!character) {
 			console.log(`Character not found for user ${player.getVariable(PlayersVariables.ServerId)}`);
-			return GENERAL_STATUS_CODES.SERVER_ERROR;
+			return GENERAL_STATUS_CODES.OK;
 		}
 
 		// TODO make a method for this later
@@ -138,11 +137,12 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 				shapeMix: characterHeadBlendData?.shapeMix,
 				skinMix: characterHeadBlendData?.skinMix,
 				thirdMix: characterHeadBlendData?.thirdMix,
-				isParent: characterHeadBlendData?.isParent,
+				isParent: characterHeadBlendData?.isParent
 			} as CharacterHeadBlendData)
 		);
 		player.setVariable(PlayersVariables.CharacterHeadBlendData, characterHeadBlendData);
 
+		// TODO make a method for this later
 		const characterComponentVariations: CharacterComponentVariation[] = (
 			await characterComponentVariationRepository.findBy({ character: character })
 		).map((characterComponentVariation: CharacterComponentVariationEntity) => {
@@ -158,6 +158,7 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		}
 		player.setVariable(PlayersVariables.CharacterComponentVariations, characterComponentVariations);
 
+		// TODO make a method for this later
 		const characterFaceFeatures: CharacterFaceFeature[] = (await characterFaceFeatureRepository.findBy({ character: character })).map(
 			(characterFaceFeature: CharacterFaceFeatureEntity) => {
 				return {
@@ -171,6 +172,7 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		}
 		player.setVariable(PlayersVariables.CharacterFaceFeatures, characterFaceFeatures);
 
+		// TODO make a method for this later
 		await rpc.callClient(
 			player,
 			CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER,
@@ -184,6 +186,7 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		);
 		player.setVariable(PlayersVariables.EyeColor, user.eyeColor);
 
+		// TODO make a method for this later
 		await rpc.callClient(
 			player,
 			CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER,

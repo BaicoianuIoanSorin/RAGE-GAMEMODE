@@ -223,7 +223,7 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, async (character
 
 	if (!characterHeadOverlays) {
 		console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS} -> characterHeadOverlays not found`);
-		return;
+		characterHeadOverlays = [];
 	}
 
 	// check if the overlay exists
@@ -276,7 +276,7 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES, async (faceFeatu
 
 	if (!characterFaceFeatures) {
 		console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS} -> characterFaceFeatures not found`);
-		return;
+		characterFaceFeatures = [];
 	}
 
 	// check if the overlay exists
@@ -314,7 +314,7 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS, async (ch
 
 	if (!characterComponentVariations) {
 		console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> characterComponentVariations not found`);
-		return;
+		characterComponentVariations = [];
 	}
 
 	// check if the overlay exists
@@ -389,7 +389,7 @@ async function saveCharacterComponentVariations(playerId: number) {
 
 	if (!characterComponentVariations) {
 		console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> characterComponentVariations not found`);
-		return;
+		characterComponentVariations = [];
 	}
 
 	for (const characterComponentVariation of characterComponentVariations) {
@@ -437,7 +437,7 @@ async function saveCharacterFaceFeatures(playerId: number) {
 
 	if (!characterFaceFeatures) {
 		console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> characterFaceFeatures not found`);
-		return;
+		characterFaceFeatures = [];
 	}
 
 	for (const characterFaceFeature of characterFaceFeatures) {
@@ -484,7 +484,7 @@ async function saveCharacterHeadOverlays(playerId: number) {
 
 	if (!characterHeadOverlays) {
 		console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> characterHeadOverlays not found`);
-		return;
+		characterHeadOverlays = [];
 	}
 
 	for (const characterHeadOverlay of characterHeadOverlays) {

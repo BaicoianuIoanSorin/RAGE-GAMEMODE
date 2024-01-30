@@ -25,6 +25,7 @@ export enum CreatorEvents {
     SERVER_SAVE_CHARACTER_HAIR_COLOR = 'server:saveCharacterHairColor',
     CLIENT_SAVE_CHARACTER_DATA_TO_DATABASE = 'client:saveCharacterDataToDatabase',
     SERVER_SAVE_CHARACTER_DATA_TO_DATABASE = 'server:saveCharacterDataToDatabase',
+    CLIENT_SPAWN_PLAYER_FROM_CHARACTER_CREATION = 'server:spawnPlayerFromCharacterCreation',
     
     SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 

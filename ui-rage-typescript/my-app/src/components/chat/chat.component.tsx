@@ -1,10 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Box,
-  VStack,
-  useDisclosure,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, VStack, useDisclosure, useToast } from "@chakra-ui/react";
 import { Textarea } from "@chakra-ui/react";
 import { makeToast } from "../../utils/components-used/toast";
 import { ChatEvents } from "../../utils/chat/events.constants";
@@ -26,7 +21,7 @@ export const ChatWindow = () => {
   }
 
   // rpc function that is called from client side for adding the message
-  if(rpc) {
+  if (rpc) {
     rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (chatMessageJSON: string) => {
       const chatMessage: ChatMessage = JSON.parse(chatMessageJSON);
       setChatMessages((prevMessages) => {
@@ -34,7 +29,7 @@ export const ChatWindow = () => {
         // Keep only the latest 20 messages
         return updatedMessages.slice(0, 20);
       });
-    })
+    });
   }
   useEffect(() => {
     // Function to handle the dimming logic
@@ -63,38 +58,46 @@ export const ChatWindow = () => {
       inputRef.current?.removeEventListener("input", clearDimTimeout);
     };
   }, [input, lastMessageTime]);
-  
+
   const handleSend = async () => {
     if (input.trim() === "") return;
 
     if (input.length > 250) {
       console.log("Message cannot exceed 250 characters.");
-        makeToast(
-          rpc,
-          toast,
-          "Chat",
-          "Message cannot exceed 250 characters.",
-          "error"
-        );
+      makeToast(
+        rpc,
+        toast,
+        "Chat",
+        "Message cannot exceed 250 characters.",
+        "error"
+      );
       return;
     }
 
     if (input.startsWith("/")) {
-        let chatEventInfo: ChatEventInfo = await rpc.callClient(ChatEvents.CLIENT_CHAT_COMMAND, input);
-        if(chatEventInfo !== undefined) {
-          makeToast(window.rpc, toast, chatEventInfo.title, chatEventInfo.description, chatEventInfo.status);
-        }
-    }
-    else {
-        await rpc.callClient(ChatEvents.CLIENT_CHAT_MESSAGE, input);
+      let chatEventInfo: ChatEventInfo = await rpc.callClient(
+        ChatEvents.CLIENT_CHAT_COMMAND,
+        input
+      );
+      if (chatEventInfo !== undefined) {
+        makeToast(
+          window.rpc,
+          toast,
+          chatEventInfo.title,
+          chatEventInfo.description,
+          chatEventInfo.status
+        );
+      }
+    } else {
+      await rpc.callClient(ChatEvents.CLIENT_CHAT_MESSAGE, input);
     }
     setInput("");
-      if (isOpen) {
-        onToggle();
-      }
-      setLastMessageTime(new Date());
-      setWindowOpacity(1); // Reset opacity when a new message is sent
-      rpc.callClient(ChatEvents.CLIENT_STOPPED_TYPING);
+    if (isOpen) {
+      onToggle();
+    }
+    setLastMessageTime(new Date());
+    setWindowOpacity(1); // Reset opacity when a new message is sent
+    rpc.callClient(ChatEvents.CLIENT_STOPPED_TYPING);
   };
 
   useEffect(() => {
@@ -147,8 +150,7 @@ export const ChatWindow = () => {
         bg="transparent" // Make message background transparent
       >
         {chatMessages.map((chatMessage, index) => (
-          <ChatMessageComponent key={index} chatMessage={chatMessage}
-          />
+          <ChatMessageComponent key={index} chatMessage={chatMessage} />
         ))}
       </VStack>
       {isOpen && (
