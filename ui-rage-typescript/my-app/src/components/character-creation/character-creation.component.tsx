@@ -56,7 +56,6 @@ export const CharacterCreationComponent: React.FC = () => {
     if (characterHairStyleComponentInformation?.gender !== newCharacterHairSyleComponentInformation?.gender) {
       setResetKey((prevKey) => prevKey + 1);
       onChangeBlendOverlayChangingColorsComponentInformation(false);
-      alert('called');
     }
 
     setCharacterHairStyleComponentInformation(

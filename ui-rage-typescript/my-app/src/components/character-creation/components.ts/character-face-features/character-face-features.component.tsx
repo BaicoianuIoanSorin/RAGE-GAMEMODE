@@ -47,7 +47,7 @@ export const CharacterFaceFeaturesComponent: React.FC<CharacterFaceFeaturesProps
               title={data.name}
               min={data.minValue}
               max={data.maxValue}
-              defaultValue={data.minValue}
+              defaultValue={0}
               step={0.1}
               data={data}
               onChangeEvent={handleSliderChange}
