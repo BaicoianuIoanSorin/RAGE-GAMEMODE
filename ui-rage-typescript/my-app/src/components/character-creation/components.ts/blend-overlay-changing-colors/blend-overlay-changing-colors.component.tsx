@@ -10,14 +10,15 @@ import {
 import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
 import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 
-interface BlendOverlayChangingColorsProps {
-  showChestHair?: boolean;
-}
+interface BlendOverlayChangingColorsProps {}
 
-export const BlendOverlayChangingColorsComponent: React.FC<BlendOverlayChangingColorsProps> = (props: BlendOverlayChangingColorsProps) => {
+export const BlendOverlayChangingColorsComponent: React.FC<
+  BlendOverlayChangingColorsProps
+> = (props: BlendOverlayChangingColorsProps) => {
   const [selectedScope, setSelectedScope] = useState<CharacterCreationData>(); // State to hold the selected scope
   const characterCreationData: CharacterCreationData[] = [
-    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, false)];
+    ...CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, false),
+  ];
 
   let rpc: any = null;
   if ("rpc" in window && "callClient" in window.rpc) {
@@ -45,7 +46,7 @@ export const BlendOverlayChangingColorsComponent: React.FC<BlendOverlayChangingC
   };
 
   const handleScopeChange = (data: CharacterCreationData) => {
-    if(isBoxComponentSelected(data)) {
+    if (isBoxComponentSelected(data)) {
       setSelectedScope(undefined);
       return;
     }
@@ -55,25 +56,16 @@ export const BlendOverlayChangingColorsComponent: React.FC<BlendOverlayChangingC
   return (
     <div className="box-with-colors-container">
       <div className="scope-choosing-container">
-        {characterCreationData.map((data: CharacterCreationData, index: number) => 
-          {
-            console.log(props.showChestHair)
-            if(data.name === "Chest Hair" && !props.showChestHair) {
-              return;
-            }
-            else {
-              console.log(data);
-              return (
-                <div onClick={() => handleScopeChange(data)}>
-                  <BoxSelectedComponent
-                  key={index}
-                    isSelected={isBoxComponentSelected(data)}
-                    data={data}
-                  />
-                </div>
-              );
-            }
-          }
+        {characterCreationData.map(
+          (data: CharacterCreationData, index: number) => (
+            <div onClick={() => handleScopeChange(data)}>
+              <BoxSelectedComponent
+                key={index}
+                isSelected={isBoxComponentSelected(data)}
+                data={data}
+              />
+            </div>
+          )
         )}
       </div>
       {/* // for eyes there are different colours, maybe have a look on the specific list of colours and names for eyes */}

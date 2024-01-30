@@ -9,11 +9,11 @@ import {
 import { CustomSlider } from "../slider/slider.component";
 import "./character-head-overlay.component.scss";
 
-interface CharacterHeadOverlayProps {
-  showChestHair?: boolean;
-}
+interface CharacterHeadOverlayProps {}
 
-export const CharacterHeadOverlayComponent: React.FC<CharacterHeadOverlayProps> = (props: CharacterHeadOverlayProps) => {
+export const CharacterHeadOverlayComponent: React.FC<
+  CharacterHeadOverlayProps
+> = (props: CharacterHeadOverlayProps) => {
   const characterCreationData: CharacterCreationData[] =
     CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.HEAD_OVERLAY, true);
 
@@ -21,15 +21,15 @@ export const CharacterHeadOverlayComponent: React.FC<CharacterHeadOverlayProps> 
   if ("rpc" in window && "callClient" in window.rpc) {
     rpc = window.rpc;
   }
-  
+
   function handleSliderChange(value: number, data?: CharacterCreationData) {
     if (rpc && data) {
       const headOverlay: CharacterHeadOverlay = {
         id: data.id,
         index: value,
         opacity: 1,
-        primaryColor: 1,
-        secondaryColor: 1,
+        primaryColor: -1,
+        secondaryColor: -1,
       } as CharacterHeadOverlay;
 
       rpc.callClient(
@@ -41,25 +41,18 @@ export const CharacterHeadOverlayComponent: React.FC<CharacterHeadOverlayProps> 
 
   return (
     <div className="character-head-overlay-container">
-      {characterCreationData.map((data: CharacterCreationData) => {
-        if(data.name === "Chest Hair" && !props.showChestHair) {
-          return;
-        }
-        else {
-          return (
-            <CustomSlider
-              title={data.name}
-              min={data.minValue ? data.minValue : 0}
-              max={data.maxValue ? data.maxValue : 0}
-              defaultValue={-1}
-              step={1}
-              data={data}
-              onChangeEvent={handleSliderChange}
-              canBeRemoved={true}
-            />
-          )
-        }
-      })}
+      {characterCreationData.map((data: CharacterCreationData) => (
+        <CustomSlider
+          title={data.name}
+          min={data.minValue ? data.minValue : 0}
+          max={data.maxValue ? data.maxValue : 0}
+          defaultValue={-1}
+          step={1}
+          data={data}
+          onChangeEvent={handleSliderChange}
+          canBeRemoved={true}
+        />
+      ))}
     </div>
   );
 };

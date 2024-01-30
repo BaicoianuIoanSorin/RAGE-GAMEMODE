@@ -22,12 +22,12 @@ export const CharacterCreationComponent: React.FC = () => {
       <div className="left-side">
         <EyeChangingColorComponent/>
         <HairStyleComponent onChangeEvent={onChangeCharacterHairStyteComponentInformation}/>
-        <BlendOverlayChangingColorsComponent showChestHair={characterHairStyleComponentInformation?.gender === 0}/>
+        <BlendOverlayChangingColorsComponent/>
         <CharacterFaceFeaturesComponent/>
       </div>
       <div className="right-side">
         <CharacterHeadBlendOverlayComponent/>
-        <CharacterHeadOverlayComponent showChestHair={characterHairStyleComponentInformation?.gender === 0}/>
+        <CharacterHeadOverlayComponent/>
       </div>
     </div>
   );

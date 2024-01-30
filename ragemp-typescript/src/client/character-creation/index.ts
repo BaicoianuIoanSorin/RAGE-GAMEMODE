@@ -105,14 +105,17 @@ async function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
 
 	switch (characterCreationCameraFlagModel.characterCreationCameraFlag) {
 		case CharacterCreationCameraFlag.HEAD: {
+			// TODO check gender and set the correct head camera
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.6 };
 			break;
 		}
 		case CharacterCreationCameraFlag.BODY: {
+			// TODO check gender and set the correct body camera
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.2 };
 			break;
 		}
 		case CharacterCreationCameraFlag.LEGS: {
+			// TODO check gender and set the correct legs camera
 			characterCreationCamera = { angle: 90, distance: 1, height: -0.5 };
 			break;
 		}
@@ -143,44 +146,70 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_EDIT, (characterCreationCameraF
 	creatorCameraEdit(characterCreationCameraFlagModelJson)
 );
 
-function setHeadOverlay(characterHeadOverlayJson: string) {
+function setHeadOverlay(characterHeadOverlayJson: string, withCameraMoving: boolean): CharacterHeadOverlay | undefined {
 	const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(characterHeadOverlayJson);
-
-	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return;
 
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY + ' ' + characterHeadOverlayJson);
 
-	player.setHeadOverlay(
-		characterHeadOverlay.id,
-		characterHeadOverlay.index,
-		characterHeadOverlay.opacity,
-		characterHeadOverlay.primaryColor,
-		characterHeadOverlay.secondaryColor
-	);
+	if (characterHeadOverlay.id < 0 || characterHeadOverlay.id > 12) return undefined;
 
-	if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 9) {
-		// TODO because it is in the same file, move the event functionality in a method
-		creatorCameraEdit(
-			JSON.stringify({
-				characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
-				withRemovingComponentVariations: true
-			} as CharacterCreationCameraFlagModel)
-		);
-	} else if (characterHeadOverlay.id >= 10 && characterHeadOverlay.id <= 12) {
-		creatorCameraEdit(
-			JSON.stringify({
-				characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
-				withRemovingComponentVariations: true
-			} as CharacterCreationCameraFlagModel)
-		);
+	if(withCameraMoving) {
+		if (characterHeadOverlay.id >= 0 && characterHeadOverlay.id <= 9) {
+			creatorCameraEdit(
+				JSON.stringify({
+					characterCreationCameraFlag: CharacterCreationCameraFlag.HEAD,
+					withRemovingComponentVariations: true
+				} as CharacterCreationCameraFlagModel)
+			);
+		} else if (characterHeadOverlay.id >= 10 && characterHeadOverlay.id <= 12) {
+			creatorCameraEdit(
+				JSON.stringify({
+					characterCreationCameraFlag: CharacterCreationCameraFlag.BODY,
+					withRemovingComponentVariations: true
+				} as CharacterCreationCameraFlagModel)
+			);
+		}
 	}
+	
+	const currentHeadOverlayValue: CharacterHeadOverlay | undefined = getHeadOverlayValue(characterHeadOverlay.id);
+	let primaryColorToSet: number = currentHeadOverlayValue?.primaryColor ?? 0;
+	let secondaryColorToSet: number = currentHeadOverlayValue?.secondaryColor ?? 0;
+
+	const characterHeadOverlayRefactored: CharacterHeadOverlay = {
+		id: characterHeadOverlay.id,
+		index: characterHeadOverlay.index,
+		opacity: characterHeadOverlay.opacity,
+		primaryColor: characterHeadOverlay.primaryColor === -1 ? primaryColorToSet : characterHeadOverlay.primaryColor,
+		secondaryColor: characterHeadOverlay.secondaryColor === -1 ? secondaryColorToSet : characterHeadOverlay.secondaryColor
+	} as CharacterHeadOverlay;
+
+	player.setHeadOverlay(
+		characterHeadOverlayRefactored.id,
+		characterHeadOverlayRefactored.index,
+		characterHeadOverlayRefactored.opacity,
+		characterHeadOverlayRefactored.primaryColor,
+		characterHeadOverlayRefactored.secondaryColor
+		);
+
+	return characterHeadOverlayRefactored;
+}
+
+function getHeadOverlayValue(headOverlayId: number): CharacterHeadOverlay | undefined {
+	const characterHeadOverlays: CharacterHeadOverlay[] = player.getVariable(PlayersVariables.CharacterHeadOverlays);
+	if (characterHeadOverlays === undefined) return undefined;
+
+	const characterHeadOverlayFound: CharacterHeadOverlay | undefined = characterHeadOverlays.find((characterHeadOverlay: CharacterHeadOverlay) => characterHeadOverlay.id === headOverlayId);
+
+	mp.console.logInfo('characterHeadOverlayFound: ' + JSON.stringify(characterHeadOverlayFound));
+	return characterHeadOverlayFound;
 }
 
 rpc.register(CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, async (characterHeadOverlayJson: string) => {
-	await setHeadOverlay(characterHeadOverlayJson);
+	const characterHeadOverlay: CharacterHeadOverlay | undefined = await setHeadOverlay(characterHeadOverlayJson, true);
 	
-	await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, characterHeadOverlayJson);
-	// TODO save head overlay to the player variables
+	if(characterHeadOverlay == undefined) return;
+
+	await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_OVERLAYS, JSON.stringify(characterHeadOverlay));
 });
 
 async function setHeadBlendData(headBlendDataJson: string) {
@@ -343,26 +372,11 @@ rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, async (gender: number, info) =>
 		setHeadBlendData(defaultHeadBlendData);
 		
 		// TODO here the head overlays are not set properly
-		// setting head overlays
-		const characterHeadOverlays: CharacterHeadOverlay[] = info.player.getVariable(PlayersVariables.CharacterHeadOverlays);
-		if (characterHeadOverlays !== undefined) {
-			for (let i = 0; i < characterHeadOverlays.length; i++) {
-				const characterHeadOverlay: CharacterHeadOverlay = characterHeadOverlays[i];
-				setHeadOverlay(JSON.stringify(characterHeadOverlay));
-			}
-		}
-		
+		setCharacterHeadOverlays();
+		setCharacterFaceFeatures();
 
-		// TODO here the face feature is not set properly
-		// setting face features
-		const characterFaceFeatures: CharacterFaceFeature[] = info.player.getVariable(PlayersVariables.CharacterFaceFeatures);
-		if (characterFaceFeatures !== undefined) {
-			for (let i = 0; i < characterHeadOverlays.length; i++) {
-				const characterFaceFeature: CharacterFaceFeature = characterFaceFeatures[i];
-				mp.console.logWarning('characterFaceFeature UPDATING: ' + JSON.stringify(characterFaceFeature));
-				setFaceFeature(JSON.stringify(characterFaceFeature));
-			}
-		}
+		// TODO here the face feature is not set properls
+		
 		// TODO when gender resets, it takes all parameters already set as well, just the eyes remained as previous (which is already done)
 
 	});
@@ -371,6 +385,32 @@ rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, async (gender: number, info) =>
 rpc.register(CreatorEvents.CLIENT_GET_GENDER, async () => {
 	return await rpc.callServer(CreatorEvents.SERVER_GET_GENDER, '');
 });
+
+/*
+Sets the character head overlays that the player has saved in variables
+*/
+function setCharacterHeadOverlays() {
+	mp.console.logInfo('setCharacterHeadOverlays');
+	const characterHeadOverlays: CharacterHeadOverlay[] = player.getVariable(PlayersVariables.CharacterHeadOverlays);
+		if (characterHeadOverlays !== undefined) {
+			for (let i = 0; i < characterHeadOverlays.length; i++) {
+				const characterHeadOverlay: CharacterHeadOverlay = characterHeadOverlays[i];
+				setHeadOverlay(JSON.stringify(characterHeadOverlay), false);
+			}
+		}
+}
+
+function setCharacterFaceFeatures() {
+	mp.console.logInfo('setCharacterFaceFeatures');
+	const characterFaceFeatures: CharacterFaceFeature[] = player.getVariable(PlayersVariables.CharacterFaceFeatures);
+		if (characterFaceFeatures !== undefined) {
+			for (let i = 0; i < characterFaceFeatures.length; i++) {
+				const characterFaceFeature: CharacterFaceFeature = characterFaceFeatures[i];
+				mp.console.logWarning('characterFaceFeature UPDATING: ' + JSON.stringify(characterFaceFeature));
+				setFaceFeature(JSON.stringify(characterFaceFeature));
+			}
+		}
+}
 
 const getCameraOffset = (position: any, angle: number, distance: number): any | undefined => {
 	angle = angle * 0.0174533;
