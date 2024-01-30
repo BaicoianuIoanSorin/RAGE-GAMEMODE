@@ -1,21 +1,19 @@
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from './User';
+import { Character } from './Character';
 
 @Entity()
 export class CharacterFaceFeature {
 	@PrimaryGeneratedColumn()
 	id: number;
-
-	@OneToOne(() => User)
-	@JoinColumn({ name: 'userId' })
-	user: User;
+	
+    @OneToOne(() => Character)
+    @JoinColumn({ name: 'characterId' }) // Ensure the column name matches your database schema
+    character: Character;
 
 	faceFeatureId: number;
 	scale: number;
 
-    constructor(user: User, faceFeatureId: number, scale: number) {
-        this.user = user;
-        this.faceFeatureId = faceFeatureId;
-        this.scale = scale;
+    constructor(character: Character) {
+        this.character = character;
     }
 }

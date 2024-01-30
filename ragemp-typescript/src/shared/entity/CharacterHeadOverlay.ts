@@ -1,14 +1,14 @@
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./User";
+import { Character } from "./Character";
 
 @Entity()
 export class CharacterHeadOverlay {
     @PrimaryGeneratedColumn()
     id: number;
    
-    @OneToOne(() => User)
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    @OneToOne(() => Character)
+    @JoinColumn({ name: 'characterId' }) // Ensure the column name matches your database schema
+    character: Character;
 
     idHeadOverlay: number;
     index: number;
@@ -16,12 +16,7 @@ export class CharacterHeadOverlay {
     primaryColor: number;
     secondaryColor: number;
     
-    constructor(user: User, idHeadOverlay: number, index: number, opacity: number, primaryColor: number, secondaryColor: number) {
-        this.user = user;
-        this.idHeadOverlay = idHeadOverlay;
-        this.index = index;
-        this.opacity = opacity;
-        this.primaryColor = primaryColor;
-        this.secondaryColor = secondaryColor;
+    constructor(character: Character) {
+        this.character = character;
     }
 }

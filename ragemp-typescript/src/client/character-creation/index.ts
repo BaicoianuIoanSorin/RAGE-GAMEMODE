@@ -44,7 +44,6 @@ import {
 	CharacterHeadBlendData,
 	CharacterHeadOverlay
 } from '@shared/character-creation/model';
-import { Character } from '@shared/entity/CharacterInformation';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import * as rpc from 'rage-rpc';
 

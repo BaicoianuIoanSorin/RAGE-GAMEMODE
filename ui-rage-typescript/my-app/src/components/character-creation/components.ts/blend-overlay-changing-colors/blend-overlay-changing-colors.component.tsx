@@ -10,7 +10,9 @@ import {
 import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
 import { BoxSelectedComponent } from "../box-selected/box-selected.component";
 
-interface BlendOverlayChangingColorsProps {}
+interface BlendOverlayChangingColorsProps {
+  onChangeEvent: (changed: boolean) => void;
+}
 
 export const BlendOverlayChangingColorsComponent: React.FC<
   BlendOverlayChangingColorsProps
@@ -35,6 +37,7 @@ export const BlendOverlayChangingColorsComponent: React.FC<
         } as CharacterCreationData)
       );
     }
+    props.onChangeEvent(true);
   };
 
   const isBoxComponentSelected = (data: CharacterCreationData): boolean => {

@@ -1,14 +1,14 @@
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./User";
+import { Character } from "./Character";
 
 @Entity()
 export class CharacterHeadBlendData {
     @PrimaryGeneratedColumn()
     id: number;
-
-    @OneToOne(() => User)
-    @JoinColumn({ name: 'userId' })
-    user: User;
+    
+    @OneToOne(() => Character)
+    @JoinColumn({ name: 'characterId' }) // Ensure the column name matches your database schema
+    character: Character;
 
     // mother shape
     shapeFirstId: number;
@@ -33,17 +33,7 @@ export class CharacterHeadBlendData {
     // this do not change anything - you can leave with false
     isParent: boolean;
 
-    constructor(user: User, shapeFirstId: number, shapeSecondId: number, shapeThirdId: number, skinFirstId: number, skinSecondId: number, skinThirdId: number, shapeMix: number, skinMix: number, thirdMix: number, isParent: boolean) {   
-        this.user = user;
-        this.shapeFirstId = shapeFirstId;
-        this.shapeSecondId = shapeSecondId;
-        this.shapeThirdId = shapeThirdId;
-        this.skinFirstId = skinFirstId;
-        this.skinSecondId = skinSecondId;
-        this.skinThirdId = skinThirdId;
-        this.shapeMix = shapeMix;
-        this.skinMix = skinMix;
-        this.thirdMix = thirdMix;
-        this.isParent = isParent;
+    constructor(character: Character) {
+        this.character = character;
     }
 }

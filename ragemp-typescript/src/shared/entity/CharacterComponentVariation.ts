@@ -1,26 +1,21 @@
 import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
-import { User } from "./User";
+import { Character } from "./Character";
 
 @Entity()
 export class CharacterComponentVariation {
-
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User)
-    @JoinColumn({ name: 'userId' }) 
-    user: User;
+    @OneToOne(() => Character)
+    @JoinColumn({ name: 'characterId' }) // Ensure the column name matches your database schema
+    character: Character;
 
     componentId: number;
     drawableId: number;
     textureId: number;
     paletteId: number;
 
-    constructor(user: User, componentId: number, drawableId: number, textureId: number, paletteId: number) {
-        this.user = user;
-        this.componentId = componentId;
-        this.drawableId = drawableId;
-        this.textureId = textureId;
-        this.paletteId = paletteId;
+    constructor(character: Character) {
+         this.character = character;
     }
 }

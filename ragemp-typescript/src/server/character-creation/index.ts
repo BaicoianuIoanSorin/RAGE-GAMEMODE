@@ -1,8 +1,8 @@
 import { AppDataSource } from '@/typeorm/typeorm';
 import { findPlayerByName } from '@/utils/players';
 import { CreatorEvents } from '@shared/character-creation/events.constants';
-import { CharacterComponentVariation, CharacterCreationCamera, CharacterCreationData, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay } from '@shared/character-creation/model';
-import { Character } from '@shared/entity/CharacterInformation';
+import { CharacterComponentVariation, CharacterCreationCamera, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay } from '@shared/character-creation/model';
+import { Character } from '@shared/entity/Character';
 import { User } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { CharacterCreationCommands } from '@shared/player/commands';

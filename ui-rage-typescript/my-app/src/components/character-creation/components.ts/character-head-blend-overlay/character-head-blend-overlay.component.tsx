@@ -14,7 +14,11 @@ import { CustomSlider } from "../slider/slider.component";
 import "./character-head-blend-overlay.component.scss";
 import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
 
-export const CharacterHeadBlendOverlayComponent: React.FC = () => {
+interface CharacterHeadBlendOverlayProps {
+  onChangeEvent: (changed: boolean) => void;
+}
+
+export const CharacterHeadBlendOverlayComponent: React.FC<CharacterHeadBlendOverlayProps> = (props: CharacterHeadBlendOverlayProps) => {
   const [selectedMotherId, setSelectedMotherId] = useState<number>(); // State to hold the selected scope
   const [selectedFatherId, setSelectedFatherId] = useState<number>(); // State to hold the selected scope
   const [shapeMix, setShapeMix] = useState<number>(0);
@@ -62,6 +66,7 @@ export const CharacterHeadBlendOverlayComponent: React.FC = () => {
         else {
           alert(`${CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA} called with ${JSON.stringify(characterHeadBlendData)}`);
         }
+        props.onChangeEvent(true);
       }
     } else if (FATHER_IDS.includes(id)) {
       setSelectedFatherId(isBoxComponentSelected(id) ? undefined : id);
@@ -118,6 +123,7 @@ export const CharacterHeadBlendOverlayComponent: React.FC = () => {
     else {
       alert(`${CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA} called with ${JSON.stringify(characterHeadBlendData)}`);
     }
+    props.onChangeEvent(true);
   };
 
   const handleSkinMixChange = (value: number) => {
@@ -146,6 +152,7 @@ export const CharacterHeadBlendOverlayComponent: React.FC = () => {
     else {
       alert(`${CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA} called with ${JSON.stringify(characterHeadBlendData)}`);
     }
+    props.onChangeEvent(true);
   };
 
   return (

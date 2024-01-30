@@ -4,12 +4,15 @@ import {
   CharacterCreationData,
   CharacterCreationScope,
   CharacterFaceFeature,
-  CharacterHeadOverlay,
 } from "../../../../utils/character-creation/model";
 import { CustomSlider } from "../slider/slider.component";
 import "./character-face-features.component.scss";
 
-export const CharacterFaceFeaturesComponent: React.FC = () => {
+interface CharacterFaceFeaturesProps {
+  onChangeEvent: (changed: boolean) => void;
+}
+
+export const CharacterFaceFeaturesComponent: React.FC<CharacterFaceFeaturesProps> = (props: CharacterFaceFeaturesProps) => {
   const characterCreationData: CharacterCreationData[] =
     CHARACTER_CREATION_BY_SCOPE(CharacterCreationScope.FACE_FEATURE, true);
 
@@ -28,6 +31,10 @@ export const CharacterFaceFeaturesComponent: React.FC = () => {
               CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE,
               JSON.stringify(faceFeature)
             );
+        }
+        
+        if(data) {
+            props.onChangeEvent(true);
         }
   }
 

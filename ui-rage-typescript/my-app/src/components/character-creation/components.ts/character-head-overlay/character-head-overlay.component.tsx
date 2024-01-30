@@ -9,7 +9,9 @@ import {
 import { CustomSlider } from "../slider/slider.component";
 import "./character-head-overlay.component.scss";
 
-interface CharacterHeadOverlayProps {}
+interface CharacterHeadOverlayProps {
+  onChangeEvent: (changed: boolean) => void;
+}
 
 export const CharacterHeadOverlayComponent: React.FC<
   CharacterHeadOverlayProps
@@ -36,6 +38,10 @@ export const CharacterHeadOverlayComponent: React.FC<
         CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY,
         JSON.stringify(headOverlay)
       );
+    }
+
+    if(data) {
+      props.onChangeEvent(true);
     }
   }
 

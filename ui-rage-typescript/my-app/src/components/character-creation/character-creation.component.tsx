@@ -56,6 +56,38 @@ export const CharacterCreationComponent: React.FC = () => {
     setIsEyeColorComponentInformationFilled(isEyeColorComponentInformationFilled);
   };
 
+  const onChangeBlendOverlayChangingColorsComponentInformation = (
+    isBlendOverlayChangingColorsComponentInformationFilled: boolean
+  ) => {
+    setIsBlendOverlayChangingColorsComponentInformationFilled(
+      isBlendOverlayChangingColorsComponentInformationFilled
+    );
+  }
+
+  const onChangeCharacterFaceFeaturesComponentInformation = (
+    isCharacterFaceFeaturesComponentInformationFilled: boolean
+  ) => {
+    setIsCharacterFaceFeaturesComponentInformationFilled(
+      isCharacterFaceFeaturesComponentInformationFilled
+    );
+  }
+
+  const onChangeCharacterHeadBlendOverlayComponentInformation = (
+    isCharacterHeadBlendOverlayComponentInformationFilled: boolean
+  ) => {
+    setIsCharacterHeadBlendOverlayComponentInformationFilled(
+      isCharacterHeadBlendOverlayComponentInformationFilled
+    );
+  }
+
+  const onChangeCharacterHeadOverlayComponentInformation = (
+    isCharacterHeadOverlayComponentInformationFilled: boolean
+  ) => {
+    setIsCharacterHeadOverlayComponentInformationFilled(
+      isCharacterHeadOverlayComponentInformationFilled
+    );
+  }
+
   function isButtonDisabled() {
     return (
       !isEyeColorComponentInformationFilled ||
@@ -70,6 +102,7 @@ export const CharacterCreationComponent: React.FC = () => {
   useEffect(() => {
     // Resetting the components by changing the key
     setResetKey((prevKey) => prevKey + 1);
+    onChangeBlendOverlayChangingColorsComponentInformation(false);
   }, [characterHairStyleComponentInformation]);
 
   // TODO add such that when the gender changes every component is reinitiliazed
@@ -80,8 +113,8 @@ export const CharacterCreationComponent: React.FC = () => {
         <HairStyleComponent
           onChangeEvent={onChangeCharacterHairStyteComponentInformation}
         />
-        <BlendOverlayChangingColorsComponent />
-        <CharacterFaceFeaturesComponent />
+        <BlendOverlayChangingColorsComponent onChangeEvent={onChangeBlendOverlayChangingColorsComponentInformation}/>
+        <CharacterFaceFeaturesComponent onChangeEvent={onChangeCharacterFaceFeaturesComponentInformation}/>
       </div>
       <div className="middle-side">
         <div
@@ -100,9 +133,9 @@ export const CharacterCreationComponent: React.FC = () => {
       </div>
       <div className="right-side">
         <div key={resetKey}>
-          <CharacterHeadBlendOverlayComponent />
+          <CharacterHeadBlendOverlayComponent onChangeEvent={onChangeCharacterHeadBlendOverlayComponentInformation}/>
         </div>
-        <CharacterHeadOverlayComponent />
+        <CharacterHeadOverlayComponent onChangeEvent={onChangeCharacterHeadOverlayComponentInformation}/>
       </div>
     </div>
   );
