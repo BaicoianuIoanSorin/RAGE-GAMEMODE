@@ -1,7 +1,7 @@
 import { DataSource } from "typeorm";
 import { User } from "@shared/entity/User";
 import { ThirstyHunger } from "@shared/entity/ThirstyHunger";
-import { Character } from "@shared/entity/Character";
+import { Character } from "@shared/entity/CharacterInformation";
 
 // Configure the data source with your connection options
 export const AppDataSource = new DataSource({

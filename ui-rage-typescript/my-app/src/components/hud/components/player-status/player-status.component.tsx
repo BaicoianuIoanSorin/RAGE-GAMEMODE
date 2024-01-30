@@ -16,22 +16,26 @@ export const PlayerStatusComponent: React.FC = () => {
     rpc = window.rpc;
   }
 
-  rpc.register(
-    ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL,
-    (thirstyHungryLevelJSON: string) => {
-      const thirstyHungryLevel: ThirstyHungerLevelModel =
-        JSON.parse(thirstyHungryLevelJSON);
-      setThirstyAndHungryLevel(thirstyHungryLevel);
-    }
-  );
+  if(rpc) {
+    rpc.register(
+      ThirstyHungerEvents.CEF_GET_HUNGRY_AND_THIRSTY_LEVEL,
+      (thirstyHungryLevelJSON: string) => {
+        const thirstyHungryLevel: ThirstyHungerLevelModel =
+          JSON.parse(thirstyHungryLevelJSON);
+        setThirstyAndHungryLevel(thirstyHungryLevel);
+      }
+    );
+  }
 
   useEffect(() => {
     // when initializing
-    rpc
+    if(rpc) {
+      rpc
       .callServer(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL)
       .then((thirstHungerLevel: ThirstyHungerLevelModel) => {
         setThirstyAndHungryLevel(thirstHungerLevel);
       });
+    }
   }, []);
 
   return (

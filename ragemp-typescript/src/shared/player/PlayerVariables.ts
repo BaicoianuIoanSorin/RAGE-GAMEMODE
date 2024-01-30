@@ -11,4 +11,5 @@ export const PlayersVariables = {
     CharacterHeadBlendData: 'characterHeadBlendData',
     CharacterFaceFeatures: 'characterFaceFeatures',
     CharacterComponentVariations: 'characterComponentVariations',
+    CharacterHairColor: 'characterHairColor',
 };

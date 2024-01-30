@@ -2,18 +2,17 @@ import { useEffect, useState } from "react";
 import "./eye-changing-color.component.scss";
 import { CreatorEvents } from "../../../../utils/character-creation/events.constants";
 import {
-  COLORS,
-  CharacterComponentVariation,
   CharacterCreationData,
   CharacterCreationScope,
-  CharacterHairStyle,
   eyeColors,
-  hairList,
 } from "../../../../utils/character-creation/model";
 import { BoxSelectedComponent } from "../box-selected/box-selected.component";
-import { RoundedBoxWithColorComponent } from "../rounded-box-with-color/rounded-box-with-color.component";
 
-export const EyeChangingColorComponent: React.FC = () => {
+interface EyeChangingColorProps {
+  onChangeEvent: (changed: boolean) => void;
+}
+
+export const EyeChangingColorComponent: React.FC<EyeChangingColorProps> = (props: EyeChangingColorProps) => {
   // 0 - male, 1 - female
   const [selectedEyeColor, setSelectedEyeColor] = useState<number>();
 
@@ -21,10 +20,6 @@ export const EyeChangingColorComponent: React.FC = () => {
   if ("rpc" in window && "callClient" in window.rpc) {
     rpc = window.rpc;
   }
-
-  useEffect(() => {
-    // TODO getting the eye color from the server - do event from client and to server and back
-  }, [])
 
   const handleEyeColorChange = (newEyeColor: number) => {
     console.log(newEyeColor);
@@ -40,6 +35,8 @@ export const EyeChangingColorComponent: React.FC = () => {
         } as CharacterCreationData;
         rpc.callClient(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, JSON.stringify(characterCreationData));
     }
+
+    props.onChangeEvent(true);
   };
 
   const isEyeColorSelected = (eyeColorId: number): boolean => {

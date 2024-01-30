@@ -82,6 +82,12 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		// for now just set it to empty array
 		player.setVariable(PlayersVariables.CharacterFaceFeatures, []);
 
+		// TODO for now null for character head blend data
+		player.setVariable(PlayersVariables.CharacterHeadBlendData, {});
+
+		// TODO for now null for character hair color
+		player.setVariable(PlayersVariables.CharacterHairColor, {});
+		
 		// TODO call method for getting component variations
 		// player.setVariable(PlayersVariables.CharacterComponentVariations, await rpc.callClient(player, AUTH.CLIENT_GET_COMPONENT_VARIATIONS));
 		// for now just set it to empty array

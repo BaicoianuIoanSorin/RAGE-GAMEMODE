@@ -22,6 +22,7 @@ export enum CreatorEvents {
     SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA = 'server:saveCharacterHeadBlendData',
     SERVER_SAVE_CHARACTER_FACE_FEATURES = 'server:saveCharacterFaceFeatures',
     SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS = 'server:saveCharacterComponentVariations',
+    SERVER_SAVE_CHARACTER_HAIR_COLOR = 'server:saveCharacterHairColor',
     
     SERVER_GET_COMPONENT_VARIATION = 'server:getComponentVariation',
 

@@ -1,8 +1,8 @@
 import { AppDataSource } from '@/typeorm/typeorm';
 import { findPlayerByName } from '@/utils/players';
 import { CreatorEvents } from '@shared/character-creation/events.constants';
-import { CharacterComponentVariation, CharacterCreationCamera, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay } from '@shared/character-creation/model';
-import { Character } from '@shared/entity/Character';
+import { CharacterComponentVariation, CharacterCreationCamera, CharacterCreationData, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay } from '@shared/character-creation/model';
+import { Character } from '@shared/entity/CharacterInformation';
 import { User } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { CharacterCreationCommands } from '@shared/player/commands';
@@ -229,7 +229,7 @@ rpc.register(CreatorEvents.SERVER_GET_GENDER, (something: string, info) => {
 });
 
 rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA, async (headBlendDataJson: string, info) => {
-    const characterHeadOverlay: CharacterHeadOverlay = JSON.parse(headBlendDataJson);
+    const characterHeadBlendData: CharacterHeadBlendData = JSON.parse(headBlendDataJson);
 
     console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA} -> SAVING ${headBlendDataJson}`);
 
@@ -240,7 +240,7 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HEAD_BLEND_DATA, async (headBle
         return;
     }
 
-    player.setVariable(PlayersVariables.CharacterHeadBlendData, characterHeadOverlay);
+    player.setVariable(PlayersVariables.CharacterHeadBlendData, characterHeadBlendData);
 });
 
 rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES, async (faceFeatureJson: string, info) => {
@@ -313,4 +313,18 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS, async (ch
     console.log(`characterComponentVariations: ${JSON.stringify(characterComponentVariations)}`);
 
     player.setVariable(PlayersVariables.CharacterComponentVariations, characterComponentVariations);
+});
+
+// TODO hair color should have two options: primary and secondary
+rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_HAIR_COLOR, async (characterHairColor: number, info) => {
+    console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_HAIR_COLOR} -> SAVING ${characterHairColor}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_HAIR_COLOR} -> player not found`);
+        return;
+    }
+
+    player.setVariable(PlayersVariables.CharacterHairColor, characterHairColor);
 });

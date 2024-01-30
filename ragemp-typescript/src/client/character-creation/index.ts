@@ -44,7 +44,7 @@ import {
 	CharacterHeadBlendData,
 	CharacterHeadOverlay
 } from '@shared/character-creation/model';
-import { Character } from '@shared/entity/Character';
+import { Character } from '@shared/entity/CharacterInformation';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import * as rpc from 'rage-rpc';
 
@@ -58,7 +58,6 @@ let bodyCamera: CameraMp | undefined,
 // IF THERE IS, THEN THE CHARACTER WILL BE LOADED AND SOMETHING ELSE HAPPENS
 // IF THERE IS NOT, THEN THE CHARACTER CREATION WILL START, CALLING THIS EVENT
 rpc.register(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT, async () => {
-	// TODO hire event in browser to close the HUD and chat and show the character creation UI
 	mp.console.logInfo(CreatorEvents.CLIENT_CREATOR_CAMERA_INIT);
 	// TODO move character on a special location
 	if (!player.isPositionFrozen) player.freezePosition(true);
@@ -107,17 +106,14 @@ async function creatorCameraEdit(characterCreationCameraFlagModelJson: string) {
 	mp.console.logInfo('characterCreationCameraFlag: ' + characterCreationCameraFlagModelJson);
 	switch (characterCreationCameraFlagModel.characterCreationCameraFlag) {
 		case CharacterCreationCameraFlag.HEAD: {
-			// TODO check gender and set the correct head camera
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.6 };
 			break;
 		}
 		case CharacterCreationCameraFlag.BODY: {
-			// TODO check gender and set the correct body camera
 			characterCreationCamera = { angle: 90, distance: 0.8, height: 0.2 };
 			break;
 		}
 		case CharacterCreationCameraFlag.LEGS: {
-			// TODO check gender and set the correct legs camera
 			characterCreationCamera = { angle: 90, distance: 1, height: -0.5 };
 			break;
 		}
@@ -310,6 +306,7 @@ rpc.register(CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER, async (characte
 					} as CharacterCreationCameraFlagModel)
 				);
 				mp.players.local.setHairColor(characterCreationData.colorChoosen, characterCreationData.colorChoosen);
+				await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_HAIR_COLOR, characterCreationData.colorChoosen);
 			}
 			return;
 		}
@@ -350,7 +347,6 @@ rpc.register(CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, async (characterCompo
 	await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS, characterComponentVariationJson);
 });
 
-// TODO probably needed
 function applyCreatorOutfit() {
 	mp.players.local.setDefaultComponentVariation();
 	mp.players.local.setComponentVariation(3, 15, 0, 0);
@@ -393,11 +389,6 @@ rpc.register(CreatorEvents.CLIENT_CHANGE_GENDER, async (gender: number, info) =>
 			} as CharacterComponentVariation;
 		setCharacterComponentVariation(JSON.stringify(defaultHairStyle));
 		await rpc.callServer(CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS, JSON.stringify(defaultHairStyle));
-
-		
-		// TODO set hair color and model
-
-		// TODO when gender resets, it takes all parameters already set as well, just the eyes remained as previous (which is already done)
 	});
 });
 

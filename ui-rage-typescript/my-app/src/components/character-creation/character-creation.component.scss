@@ -5,6 +5,7 @@
     height: 100vh;
     display: flex;
     justify-content: space-between;
+    align-items: start;
 }
 
 .character-creation-side-style {
@@ -44,4 +45,67 @@
 
 .right-side {
     @extend .character-creation-side-style;
+}
+
+.middle-side {
+    align-self: flex-end; /* Aligns this item to the end of the flex container */
+    margin-top: auto; /* Pushes the item to the bottom */
+    padding-bottom: 1vh; /* Adds a little padding to the bottom */
+    display: flex; /* Use flex to center the button */
+    justify-content: center; /* Center button horizontally */
+}
+
+.middle-side button {
+    background-color: #86a859; /* Primary color for the button */
+    color: white; /* Text color */
+    font-size: 1em; /* Adjust as needed */
+    padding: 10px 20px; /* Padding inside the button */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Cursor changes to pointer on hover */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.middle-side button:hover {
+    background-color: #769f5b; /* Slightly darker shade on hover */
+}
+
+.middle-side button:disabled {
+    background-color: #b0b0b0; /* A neutral color for disabled state */
+    color: #757575; /* Dimmed text color */
+    cursor: not-allowed; /* Cursor indicates the button is not interactive */
+}
+
+
+.tooltip-container {
+    position: relative;
+    display: inline-block; /* or 'block' depending on your layout */
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 120%; /* Position above the button */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #86a859; /* Primary color for the tooltip */
+    color: white; /* Text color */
+    padding: 8px 12px; /* Padding inside the tooltip */
+    border-radius: 6px; /* Rounded corners */
+    font-size: 0.9em; /* Font size */
+    white-space: nowrap;
+    z-index: 1000; /* High z-index to ensure it's above other elements */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15); /* Subtle shadow for depth */
+    opacity: 0; /* Initially hidden */
+    visibility: hidden; /* Make it invisible initially */
+    transition: all 0.3s ease; /* Smooth transition for opacity and visibility */
+}
+
+.middle-side .tooltip-container:hover .tooltip {
+    opacity: 1; /* Show tooltip on hover */
+    visibility: visible; /* Make it visible on hover */
+}
+
+.middle-side button:disabled + .tooltip {
+    opacity: 1; /* Ensure tooltip is visible when hovering over disabled button */
+    visibility: visible;
 }

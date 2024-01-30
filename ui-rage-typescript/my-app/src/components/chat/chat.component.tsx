@@ -26,14 +26,16 @@ export const ChatWindow = () => {
   }
 
   // rpc function that is called from client side for adding the message
-  rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (chatMessageJSON: string) => {
-    const chatMessage: ChatMessage = JSON.parse(chatMessageJSON);
-    setChatMessages((prevMessages) => {
-      const updatedMessages = [chatMessage, ...prevMessages];
-      // Keep only the latest 20 messages
-      return updatedMessages.slice(0, 20);
-    });
-  })
+  if(rpc) {
+    rpc.register(ChatEvents.CEF_RECEIVE_MESSAGE, (chatMessageJSON: string) => {
+      const chatMessage: ChatMessage = JSON.parse(chatMessageJSON);
+      setChatMessages((prevMessages) => {
+        const updatedMessages = [chatMessage, ...prevMessages];
+        // Keep only the latest 20 messages
+        return updatedMessages.slice(0, 20);
+      });
+    })
+  }
   useEffect(() => {
     // Function to handle the dimming logic
     const dimChatWindow = () => {
