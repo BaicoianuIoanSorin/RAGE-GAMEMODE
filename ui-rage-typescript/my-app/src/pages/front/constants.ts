@@ -3,6 +3,6 @@ import { Window, WindowsMapper } from "../../utils/events-constants/windows.cons
 export const defaultWindowsOpened:  Map<string, boolean> = new Map<string, boolean>([
   [Window.REGISTER, false],
   [Window.LOGIN, false],
-  [Window.HUD, false],
-  [Window.CHARACTER_CREATION, true]
+  [Window.HUD, true],
+  [Window.CHARACTER_CREATION, false]
 ]);

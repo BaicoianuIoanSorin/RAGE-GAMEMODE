@@ -222,6 +222,8 @@ rpc.register(CreatorEvents.SERVER_GET_GENDER, (something: string, info) => {
         console.log(`replacing ${characterHeadOverlay}`)
         characterHeadOverlays[index] = characterHeadOverlay;
     }
+    
+    console.log(`characterHeadOverlays: ${JSON.stringify(characterHeadOverlays)}`);
 
     player.setVariable(PlayersVariables.CharacterHeadOverlays, characterHeadOverlays);
 });
@@ -272,7 +274,43 @@ rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_FACE_FEATURES, async (faceFeatu
         characterFaceFeatures[index] = faceFeature;
     }
     
-    console.log(`characterFaceFeatures: ${characterFaceFeatures}`);
+    console.log(`characterFaceFeatures: ${JSON.stringify(characterFaceFeatures)}`);
 
     player.setVariable(PlayersVariables.CharacterFaceFeatures, characterFaceFeatures);
+});
+
+rpc.register(CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS, async (characterComponentVariationJson: string, info) => {
+    const componentVariation: CharacterComponentVariation = JSON.parse(characterComponentVariationJson);
+
+    console.log(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> SAVING ${characterComponentVariationJson}`);
+
+    let player: PlayerMp | undefined = findPlayerByName(info.player.name);
+
+    if(!player) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> player not found`);
+        return;
+    }
+
+    let characterComponentVariations: CharacterComponentVariation[] | undefined = player.getVariable(PlayersVariables.CharacterComponentVariations);
+
+    if(!characterComponentVariations) {
+        console.error(`${CreatorEvents.SERVER_SAVE_CHARACTER_COMPONENT_VARIATIONS} -> characterComponentVariations not found`);
+        return;
+    }
+    
+    // check if the overlay exists
+    let index: number = characterComponentVariations.findIndex((characterComponentVariation: CharacterComponentVariation) => characterComponentVariation.componentId === componentVariation.componentId);
+    if(index === -1) {
+        // if it doesn't exist, push it
+        console.log(`pushing ${componentVariation}`)
+        characterComponentVariations.push(componentVariation);
+    } else {
+        // if it exists, replace it
+        console.log(`replacing ${componentVariation}`)
+        characterComponentVariations[index] = componentVariation;
+    }
+    
+    console.log(`characterComponentVariations: ${JSON.stringify(characterComponentVariations)}`);
+
+    player.setVariable(PlayersVariables.CharacterComponentVariations, characterComponentVariations);
 });

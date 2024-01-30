@@ -40,6 +40,8 @@ export const HairStyleComponent: React.FC<HairStyleProps> = (props: HairStylePro
           characterHairStyle: selectedHairStyle,
           gender: newGender,
         } as CharacterHairStyleComponentInformation)
+
+        setSelectedHairStyle(hairList[newGender][0]);
     }
     else {
       props.onChangeEvent({

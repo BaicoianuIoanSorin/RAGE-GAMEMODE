@@ -10,4 +10,5 @@ export const PlayersVariables = {
     CharacterHeadOverlays: 'characterHeadOverlays',
     CharacterHeadBlendData: 'characterHeadBlendData',
     CharacterFaceFeatures: 'characterFaceFeatures',
+    CharacterComponentVariations: 'characterComponentVariations',
 };

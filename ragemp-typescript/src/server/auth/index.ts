@@ -82,6 +82,11 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 		// for now just set it to empty array
 		player.setVariable(PlayersVariables.CharacterFaceFeatures, []);
 
+		// TODO call method for getting component variations
+		// player.setVariable(PlayersVariables.CharacterComponentVariations, await rpc.callClient(player, AUTH.CLIENT_GET_COMPONENT_VARIATIONS));
+		// for now just set it to empty array
+		player.setVariable(PlayersVariables.CharacterComponentVariations, []);
+
 		return GENERAL_STATUS_CODES.OK;
 	} catch (error: any) {
 		console.log(error);
