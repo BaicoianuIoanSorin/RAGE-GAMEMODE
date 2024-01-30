@@ -1,13 +1,16 @@
 import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
-import { CharacterComponentVariation } from "./CharacterComponentVariation";
-import { User } from "./User";
+import { UserEntity } from "./User";
 
 @Entity()
-export class Character {
+export class CharacterEntity {
     @PrimaryGeneratedColumn()
     id: number;
    
-    @OneToOne(() => User)
+    @OneToOne(() => UserEntity)
     @JoinColumn({ name: 'userId' })
-    user: User;
+    user: UserEntity;
+
+    constructor(user: UserEntity) {
+        this.user = user;
+    }
 }

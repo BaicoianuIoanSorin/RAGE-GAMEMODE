@@ -1,14 +1,14 @@
 import { Column, Entity, PrimaryGeneratedColumn, JoinColumn, OneToOne } from "typeorm";
-import { User } from "./User";
+import { UserEntity } from "./User";
 
 @Entity()
-export class ThirstyHunger {
+export class ThirstyHungerEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @OneToOne(() => User)
+    @OneToOne(() => UserEntity)
     @JoinColumn({ name: 'userId' })
-    user: User;
+    user: UserEntity;
 
     @Column({default: 100})
     thirstyLevel: number = 100;
@@ -16,7 +16,7 @@ export class ThirstyHunger {
     @Column({default: 100})
     hungryLevel: number = 100;
 
-    constructor(user: User) {
+    constructor(user: UserEntity) {
         this.user = user;
     }
 }

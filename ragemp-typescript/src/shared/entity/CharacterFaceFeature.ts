@@ -1,19 +1,22 @@
-import { Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Character } from './Character';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { CharacterEntity } from './Character';
 
 @Entity()
-export class CharacterFaceFeature {
+export class CharacterFaceFeatureEntity {
 	@PrimaryGeneratedColumn()
 	id: number;
 	
-    @OneToOne(() => Character)
+    @ManyToOne(() => CharacterEntity)
     @JoinColumn({ name: 'characterId' }) // Ensure the column name matches your database schema
-    character: Character;
+    character: CharacterEntity;
 
+    @Column({default: -1})
 	faceFeatureId: number;
+
+    @Column({default: -1})
 	scale: number;
 
-    constructor(character: Character) {
+    constructor(character: CharacterEntity) {
         this.character = character;
     }
 }

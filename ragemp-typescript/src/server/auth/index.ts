@@ -3,14 +3,34 @@ import { GENERAL_STATUS_CODES, LOGIN_STATUS_CODES } from '@shared/status-codes/s
 import { SKY_CAMERA } from '@shared/position-savings/events.constants';
 import * as rpc from 'rage-rpc';
 import { AppDataSource } from '@/typeorm/typeorm';
-import { User } from '@shared/entity/User';
+import { UserEntity } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
-import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
+import { ThirstyHungerEntity } from '@shared/entity/ThirstyHunger';
+import {
+	CHARACTER_CREATION_DATA,
+	CharacterComponentVariation,
+	CharacterCreationData,
+	CharacterCreationScope,
+	CharacterFaceFeature,
+	CharacterHeadBlendData,
+	CharacterHeadOverlay
+} from '@shared/character-creation/model';
+import { CharacterEntity } from '@shared/entity/Character';
+import { CharacterComponentVariationEntity } from '@shared/entity/CharacterComponentVariation';
+import { CharacterFaceFeatureEntity } from '@shared/entity/CharacterFaceFeature';
+import { CharacterHeadBlendDataEntity } from '@shared/entity/CharacterHeadBlendData';
+import { CharacterHeadOverlayEntity } from '@shared/entity/CharacterHeadOverlay';
+import { CreatorEvents } from '@shared/character-creation/events.constants';
 
-const freemodeCharacters = [mp.joaat("mp_m_freemode_01"), mp.joaat("mp_f_freemode_01")];
+const freemodeCharacters = [mp.joaat('mp_m_freemode_01'), mp.joaat('mp_f_freemode_01')];
 
-const userRepository = AppDataSource.getRepository(User);
-const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHunger);
+const userRepository = AppDataSource.getRepository(UserEntity);
+const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHungerEntity);
+const characterRepository = AppDataSource.getRepository(CharacterEntity);
+const characterComponentVariationRepository = AppDataSource.getRepository(CharacterComponentVariationEntity);
+const characterFaceFeatureRepository = AppDataSource.getRepository(CharacterFaceFeatureEntity);
+const characterHeadBlendDataRepository = AppDataSource.getRepository(CharacterHeadBlendDataEntity);
+const characterHeadOverlayRepository = AppDataSource.getRepository(CharacterHeadOverlayEntity);
 
 function isElegible(player: PlayerMp, password: string) {
 	if (!password) {
@@ -40,7 +60,8 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 	if (!isElegible(player, formFields.password)) return;
 
 	try {
-		const user: User | null = await userRepository.findOneBy({ username: player.name });
+		const user: UserEntity | null = await userRepository.findOneBy({ username: player.name });
+		console.info(`user: ${JSON.stringify(user)}`);
 		if (!user) {
 			return LOGIN_STATUS_CODES.USERNAME_IS_NOT_VALID;
 		}
@@ -57,7 +78,7 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 			[PlayersVariables.Admin]: user.admin,
 			[PlayersVariables.Helper]: user.helper,
 			[PlayersVariables.Gender]: user.gender,
-			[PlayersVariables.EyeColor]: user.eyeColor,
+			[PlayersVariables.EyeColor]: user.eyeColor
 		});
 
 		player.model = freemodeCharacters[user.gender];
@@ -71,27 +92,110 @@ rpc.register(AUTH.SERVER_LOGIN, async (formFieldsJSON) => {
 				state: true
 			})
 		);
-		
+
 		// TODO call method for getting head overlays
 		// player.setVariable(PlayersVariables.CharacterHeadOverlays, await rpc.callClient(player, AUTH.CLIENT_GET_HEAD_OVERLAYS));
 		// for now just set it to empty array
-		player.setVariable(PlayersVariables.CharacterHeadOverlays, []);
+		const character: CharacterEntity | null = await characterRepository.findOne({where: { user: player.getVariable(PlayersVariables.ServerId) }});
 
-		// TODO call method for getting face features
-		// player.setVariable(PlayersVariables.CharacterFaceFeatures, await rpc.callClient(player, AUTH.CLIENT_GET_FACE_FEATURES));
-		// for now just set it to empty array
-		player.setVariable(PlayersVariables.CharacterFaceFeatures, []);
+		if (!character) {
+			console.log(`Character not found for user ${player.getVariable(PlayersVariables.ServerId)}`);
+			return GENERAL_STATUS_CODES.SERVER_ERROR;
+		}
 
-		// TODO for now null for character head blend data
-		player.setVariable(PlayersVariables.CharacterHeadBlendData, {});
+		// TODO make a method for this later
+		const characterHeadOverlays: CharacterHeadOverlay[] = (await characterHeadOverlayRepository.findBy({ character: character })).map(
+			(characterHeadOverlay: CharacterHeadOverlayEntity) => {
+				return {
+					id: characterHeadOverlay.idHeadOverlay,
+					index: characterHeadOverlay.index,
+					opacity: characterHeadOverlay.opacity,
+					primaryColor: characterHeadOverlay.primaryColor,
+					secondaryColor: characterHeadOverlay.secondaryColor
+				} as CharacterHeadOverlay;
+			}
+		);
 
-		// TODO for now null for character hair color
-		player.setVariable(PlayersVariables.CharacterHairColor, {});
-		
-		// TODO call method for getting component variations
-		// player.setVariable(PlayersVariables.CharacterComponentVariations, await rpc.callClient(player, AUTH.CLIENT_GET_COMPONENT_VARIATIONS));
-		// for now just set it to empty array
-		player.setVariable(PlayersVariables.CharacterComponentVariations, []);
+		for (const characterHeadOverlay of characterHeadOverlays) {
+			await rpc.callClient(player, CreatorEvents.CLIENT_CREATOR_SET_HEAD_OVERLAY, JSON.stringify(characterHeadOverlay));
+		}
+		player.setVariable(PlayersVariables.CharacterHeadOverlays, characterHeadOverlays);
+
+		// TODO make a method for this later
+		const characterHeadBlendData: CharacterHeadBlendDataEntity | null = await characterHeadBlendDataRepository.findOneBy({
+			character: character
+		});
+		await rpc.callClient(
+			player,
+			CreatorEvents.CLIENT_CREATOR_SET_HEAD_BLEND_DATA,
+			JSON.stringify({
+				shapeFirstId: characterHeadBlendData?.shapeFirstId,
+				shapeSecondId: characterHeadBlendData?.shapeSecondId,
+				shapeThirdId: characterHeadBlendData?.shapeThirdId,
+				skinFirstId: characterHeadBlendData?.skinFirstId,
+				skinSecondId: characterHeadBlendData?.skinSecondId,
+				skinThirdId: characterHeadBlendData?.skinThirdId,
+				shapeMix: characterHeadBlendData?.shapeMix,
+				skinMix: characterHeadBlendData?.skinMix,
+				thirdMix: characterHeadBlendData?.thirdMix,
+				isParent: characterHeadBlendData?.isParent,
+			} as CharacterHeadBlendData)
+		);
+		player.setVariable(PlayersVariables.CharacterHeadBlendData, characterHeadBlendData);
+
+		const characterComponentVariations: CharacterComponentVariation[] = (
+			await characterComponentVariationRepository.findBy({ character: character })
+		).map((characterComponentVariation: CharacterComponentVariationEntity) => {
+			return {
+				componentId: characterComponentVariation.componentId,
+				drawableId: characterComponentVariation.drawableId,
+				textureId: characterComponentVariation.textureId,
+				paletteId: characterComponentVariation.paletteId
+			} as CharacterComponentVariation;
+		});
+		for (const characterComponentVariation of characterComponentVariations) {
+			await rpc.callClient(player, CreatorEvents.CLIENT_SET_COMPONENT_VARIATION, JSON.stringify(characterComponentVariation));
+		}
+		player.setVariable(PlayersVariables.CharacterComponentVariations, characterComponentVariations);
+
+		const characterFaceFeatures: CharacterFaceFeature[] = (await characterFaceFeatureRepository.findBy({ character: character })).map(
+			(characterFaceFeature: CharacterFaceFeatureEntity) => {
+				return {
+					id: characterFaceFeature.faceFeatureId,
+					scale: characterFaceFeature.scale
+				} as CharacterFaceFeature;
+			}
+		);
+		for (const characterFaceFeature of characterFaceFeatures) {
+			await rpc.callClient(player, CreatorEvents.CLIENT_CREATOR_SET_FACE_FEATURE, JSON.stringify(characterFaceFeature));
+		}
+		player.setVariable(PlayersVariables.CharacterFaceFeatures, characterFaceFeatures);
+
+		await rpc.callClient(
+			player,
+			CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER,
+			JSON.stringify({
+				name: 'Eye Color',
+				scope: CharacterCreationScope.EYE_COLOR,
+				// id does not matter for eye color
+				id: 0,
+				colorChoosen: user.eyeColor
+			} as CharacterCreationData)
+		);
+		player.setVariable(PlayersVariables.EyeColor, user.eyeColor);
+
+		await rpc.callClient(
+			player,
+			CreatorEvents.CLIENT_CREATOR_EDIT_COLORS_CHARACTER,
+			JSON.stringify({
+				name: 'Hair Color',
+				scope: CharacterCreationScope.HAIR_COLOR,
+				// id does not matter for hair color
+				id: user.gender,
+				colorChoosen: user.hairColor
+			} as CharacterCreationData)
+		);
+		player.setVariable(PlayersVariables.CharacterHairColor, user.hairColor);
 
 		return GENERAL_STATUS_CODES.OK;
 	} catch (error: any) {
@@ -114,10 +218,10 @@ rpc.register(AUTH.SERVER_REGISTER, async (formFieldsJSON) => {
 		}
 
 		// TODO hash this password
-		const newUser = new User(player.name, formFields.password, formFields.email);
+		const newUser = new UserEntity(player.name, formFields.password, formFields.email);
 		await userRepository.save(newUser);
 
-		const newThirstyHunger = new ThirstyHunger(newUser);
+		const newThirstyHunger = new ThirstyHungerEntity(newUser);
 		await thirstyHungerRepository.save(newThirstyHunger);
 		return GENERAL_STATUS_CODES.OK;
 	} catch (error: any) {

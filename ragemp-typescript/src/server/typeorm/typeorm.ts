@@ -1,11 +1,11 @@
 import { DataSource } from 'typeorm';
-import { User } from '@shared/entity/User';
-import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
-import { CharacterComponentVariation } from '@shared/entity/CharacterComponentVariation';
-import { CharacterFaceFeature } from '@shared/entity/CharacterFaceFeature';
-import { CharacterHeadBlendData } from '@shared/entity/CharacterHeadBlendData';
-import { CharacterHeadOverlay } from '@shared/entity/CharacterHeadOverlay';
-import { Character } from '@shared/entity/Character';
+import { UserEntity } from '@shared/entity/User';
+import { ThirstyHungerEntity } from '@shared/entity/ThirstyHunger';
+import { CharacterComponentVariationEntity } from '@shared/entity/CharacterComponentVariation';
+import { CharacterFaceFeatureEntity } from '@shared/entity/CharacterFaceFeature';
+import { CharacterHeadBlendDataEntity } from '@shared/entity/CharacterHeadBlendData';
+import { CharacterHeadOverlayEntity } from '@shared/entity/CharacterHeadOverlay';
+import { CharacterEntity } from '@shared/entity/Character';
 
 // Configure the data source with your connection options
 export const AppDataSource = new DataSource({
@@ -15,7 +15,7 @@ export const AppDataSource = new DataSource({
 	username: 'admin',
 	password: 'adminparola',
 	database: 'ragemp_server_2025_v2',
-	entities: [User, ThirstyHunger, Character, CharacterComponentVariation, CharacterFaceFeature, CharacterHeadBlendData, CharacterHeadOverlay], // Include your entity models here
+	entities: [UserEntity, ThirstyHungerEntity, CharacterEntity, CharacterComponentVariationEntity, CharacterFaceFeatureEntity, CharacterHeadBlendDataEntity, CharacterHeadOverlayEntity], // Include your entity models here
 	synchronize: true, // Note: Only use in development environment!
 	logging: true,
 	driver: require('mysql2')

@@ -1,15 +1,15 @@
 import { AppDataSource } from '@/typeorm/typeorm';
-import { ThirstyHunger } from '@shared/entity/ThirstyHunger';
-import { User } from '@shared/entity/User';
+import { ThirstyHungerEntity } from '@shared/entity/ThirstyHunger';
+import { UserEntity } from '@shared/entity/User';
 import { PlayersVariables } from '@shared/player/PlayerVariables';
 import { ThirstyHungerEvents } from '@shared/thirsty-hunger/events.constants';
 import { ThirstyHungerLevelModel } from '@shared/thirsty-hunger/model';
 import * as rpc from 'rage-rpc';
 
-const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHunger);
+const thirstyHungerRepository = AppDataSource.getRepository(ThirstyHungerEntity);
 
 rpc.register(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL, async (message, info) => {
-    const userId = info.player.getVariable(PlayersVariables.serverId);
+    const userId = info.player.getVariable(PlayersVariables.ServerId);
     console.log(`${ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL} for user ${userId}`)
     
     try {
@@ -33,11 +33,11 @@ rpc.register(ThirstyHungerEvents.SERVER_GET_HUNGRY_AND_THIRSTY_LEVEL, async (mes
 })
 
 rpc.register(ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL, async (id) => {
-    const userId = mp.players.at(id).getOwnVariable(PlayersVariables.serverId);
+    const userId = mp.players.at(id).getOwnVariable(PlayersVariables.ServerId);
     console.log(`${ThirstyHungerEvents.SERVER_UPDATE_HUNGRY_AND_THIRSTY_LEVEL} for user ${userId}`)
 
     try {
-        const thirstyHunger: ThirstyHunger | null = await thirstyHungerRepository.findOne({where: {user: userId}});
+        const thirstyHunger: ThirstyHungerEntity | null = await thirstyHungerRepository.findOne({where: {user: userId}});
         if (!thirstyHunger) {
             console.log(`ThirstyHunger not found for user ${userId}`);
             return;
